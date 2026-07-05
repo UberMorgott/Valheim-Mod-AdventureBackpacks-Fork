@@ -152,6 +152,7 @@
         <Compile Include="Assets\Factories\EffectsFactory.cs" />
         <Compile Include="Assets\Factories\FactoryBase.cs" />
         <Compile Include="Assets\Items\AssetItem.cs" />
+        <Compile Include="Assets\Items\IronBackpackIconFix.cs" />
         <Compile Include="Assets\Items\BackpackItem.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackBlackForest.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackMeadows.cs" />
@@ -186,6 +187,7 @@
         <Compile Include="Compats\ChebsNecromancy.cs" />
         <Compile Include="Features\Utilities.cs" />
         <EmbeddedResource Include="Assets\Bundles\chebsbackpack" />
+        <EmbeddedResource Include="Assets\Icons\IronBackpack_Icon.png" />
         <Compile Include="Patches\ItemStand.cs" />
     </ItemGroup>
     <ItemGroup>

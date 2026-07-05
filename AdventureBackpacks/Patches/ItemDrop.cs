@@ -3,8 +3,10 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Threading;
 using AdventureBackpacks.Assets;
+using AdventureBackpacks.Assets.Items;
 using AdventureBackpacks.Components;
 using HarmonyLib;
+using UnityEngine;
 using Vapok.Common.Managers;
 
 namespace AdventureBackpacks.Patches;
@@ -109,6 +111,24 @@ public class ItemDropPatches
                 AdventureBackpacks.Log.Error($"{nameof(ItemDrop.ItemData.GetWeight)} Transpiler Failed To Patch");
                 Thread.Sleep(5000);
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(ItemDrop.ItemData), nameof(ItemDrop.ItemData.GetIcon))]
+    static class ItemDataGetIconIronHdBackpack
+    {
+        static bool Prefix(ItemDrop.ItemData __instance, ref Sprite __result)
+        {
+            if (!IronBackpackIconFix.IsIronHdBackpack(__instance))
+                return true;
+
+            var icon = IronBackpackIconFix.GetOrCreateIcon();
+            if (icon == null)
+                return true;
+
+            __result = icon;
+            IronBackpackIconFix.NotifyGetIconOverride(__instance);
+            return false;
         }
     }
 

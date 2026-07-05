@@ -1,3 +1,34 @@
+# Adventure Backpacks HD — graphics fork
+
+This repository is a **fork of [Adventure Backpacks](https://github.com/Vapok/AdventureBackpacks)** by **Vapok** — an excellent Valheim mod that adds progression-based backpacks, inventory, effects, and a full API. **Gameplay, balance, recipes, and features are unchanged here.** The goal of this fork is **higher-fidelity graphics** for selected backpacks (starting with the Rugged / iron HD pack), not new mechanics.
+
+Upstream project: [github.com/Vapok/AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) · Community: [Vapok's Mods Discord](https://discord.gg/5YAJkRFBXt)
+
+---
+
+## What we changed (Jul 2026)
+
+Work lives under **`AdventureBackpacksHD/`** in this workspace. Detailed build/deploy notes: **[`advice.md`](../advice.md)** (workspace root).
+
+| Area | Summary |
+|------|---------|
+| **HD Rugged (iron) mesh** | Replaced legacy 128×128 cape mesh with a Meshy AI model; preserved asset GUIDs, bind poses, and bone-weight transfer. Automated via `ReplaceIronBackpackFromMeshy.cs`. |
+| **Equipped fit** | Tuned scale, rotation, and offset on the skinned mesh; preview in Unity without launching Valheim. |
+| **Material** | `IronBackpack.mat` uses Unity **Standard** (Valheim triplanar/DS shaders broke visibility); lowered metallic/smoothness for in-game glare. |
+| **Inventory icon** | Runtime **`IronBackpackIconFix`** embeds a 64×64 PNG in the DLL and patches **`BackpackBlackForest`** + **`CapeIronBackpack`** (in-game “Rugged Backpack” is the Black Forest item). Unity renders the icon with tuned camera/lighting. |
+| **Drop particles** | Meadows-style cinders: **only on the ground** (`log` / `DropParticles` child), not when equipped; inverse scale compensates `log` ×100. |
+| **Build / deploy** | Unity `Tools → Adventure Backpacks → Build AssetBundles and Deploy Mod`, or `.\build-adventure-backpacks.ps1` from the workspace root. |
+
+**Scope note:** C# changes are limited to what was needed for icons and bundle loading. We did not alter backpack progression, API behavior, or config semantics. When merging upstream Vapok releases, prefer keeping their logic and re-applying asset + small fix layers from this fork.
+
+---
+
+## Original mod documentation (Vapok)
+
+The sections below are **Vapok’s upstream README**, preserved as-is for install instructions, features, compatibility, and credits.
+
+---
+
 # Adventure Backpacks by Vapok
 
 This Valheim mod seeks to introduce the concept of Backpacks throughout the Valheim progression. 

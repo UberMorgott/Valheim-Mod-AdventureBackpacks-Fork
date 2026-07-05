@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using AdventureBackpacks.Assets;
 using AdventureBackpacks.Assets.Factories;
+using AdventureBackpacks.Assets.Items;
 using AdventureBackpacks.Compats;
 using AdventureBackpacks.Configuration;
 using AdventureBackpacks.Extensions;
@@ -152,6 +153,7 @@ namespace AdventureBackpacks
             //Register Assets
             var backpackFactory = new BackpackFactory(_log, _config);
             backpackFactory.CreateAssets();
+            IronBackpackIconFix.Apply();
             
             //Setup Backpack Types
             Backpacks.LoadBackpackTypes(BackpackFactory.BackpackTypes());
