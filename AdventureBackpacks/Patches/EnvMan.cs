@@ -15,7 +15,9 @@ public class EnvManPatches
         {
             if (Player.m_localPlayer == null)
                 return true;
-            var effect = EffectsFactory.EffectList[BackpackEffect.ColdResistance];
+            // Effect registry can be empty if Awake() aborted; degrade quietly instead of throwing every frame.
+            if (!EffectsFactory.EffectList.TryGetValue(BackpackEffect.ColdResistance, out var effect))
+                return true;
             if (effect.IsEffectActive(Player.m_localPlayer))
             {
                 __result = false;
@@ -35,7 +37,8 @@ public class EnvManPatches
             if (Player.m_localPlayer == null)
                 return true;
 
-            var waterResistEffect = EffectsFactory.EffectList[BackpackEffect.WaterResistance];
+            if (!EffectsFactory.EffectList.TryGetValue(BackpackEffect.WaterResistance, out var waterResistEffect))
+                return true;
             if (waterResistEffect.IsEffectActive(Player.m_localPlayer))
             {
                 __result = false;

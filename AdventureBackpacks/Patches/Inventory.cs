@@ -225,8 +225,10 @@ public static class InventoryPatches
     [HarmonyPatch(typeof(Inventory), nameof(Inventory.AddItem),
         new[]
         {
+            // Valheim 1.0.7: AddItem(name, stack, quality, variant, crafterID, crafterName, position,
+            //                        cheated, pickedUp = false, dropIfFullInv = true)
             typeof(string), typeof(int), typeof(int), typeof(int), typeof(long), typeof(string), typeof(Vector2i),
-            typeof(bool)
+            typeof(bool), typeof(bool), typeof(bool)
         })]
     [HarmonyPriority(Priority.First)]
     static class AddItemCraftingPatch
@@ -409,7 +411,8 @@ public static class InventoryPatches
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
         static class IsTeleportablePatch
         {
-            static void Postfix(Inventory __instance, ref bool __result)
+            // Valheim 1.0.7 added the allowAllItems parameter; forward the caller's value to nested inventories.
+            static void Postfix(Inventory __instance, ref bool __result, bool allowAllItems)
             {
                 if (__instance == null || Player.m_localPlayer == null)
                     return;
@@ -424,7 +427,7 @@ public static class InventoryPatches
                     if (Player.m_localPlayer.IsBackpackEquipped())
                     {
                         var backpack = Player.m_localPlayer.GetEquippedBackpack();
-                        if (backpack != null && !backpack.GetInventory().IsTeleportable())
+                        if (backpack != null && !backpack.GetInventory().IsTeleportable(allowAllItems))
                         {
                             __result = false;
                             return;
@@ -440,7 +443,7 @@ public static class InventoryPatches
                     
                         if (item.IsBackpack())
                         {
-                            if (!item.Data().GetOrCreate<BackpackComponent>().GetInventory().IsTeleportable())
+                            if (!item.Data().GetOrCreate<BackpackComponent>().GetInventory().IsTeleportable(allowAllItems))
                             {
                                 // A backpack's inventory inside player inventory was not teleportable.
                                 __result = false;
