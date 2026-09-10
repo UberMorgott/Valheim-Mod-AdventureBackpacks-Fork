@@ -167,7 +167,6 @@ namespace AdventureBackpacks
             //Register Assets
             var backpackFactory = new BackpackFactory(_log, _config);
             backpackFactory.CreateAssets();
-            IronBackpackIconFix.Apply();
             
             //Setup Backpack Types
             Backpacks.LoadBackpackTypes(BackpackFactory.BackpackTypes());

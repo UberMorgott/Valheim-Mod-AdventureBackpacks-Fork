@@ -1,5 +1,4 @@
-﻿using AdventureBackpacks.Assets.Items;
-using HarmonyLib;
+﻿using HarmonyLib;
 
 namespace AdventureBackpacks.Patches;
 
@@ -14,18 +13,5 @@ public class FejdStartupPatches
         {
             AdventureBackpacks.Waiter.ValheimIsAwake(true);
         }
-    }
-
-    [HarmonyPatch(typeof(FejdStartup), nameof(FejdStartup.Start))]
-    [HarmonyAfter("org.bepinex.helpers.ItemManager")]
-    static class FejdStartupAfterItemManagerIconFix
-    {
-        static void Postfix() => IronBackpackIconFix.Apply();
-    }
-
-    [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.Awake))]
-    static class ObjectDBAwakeIronIconFix
-    {
-        static void Postfix() => IronBackpackIconFix.Apply();
     }
 }

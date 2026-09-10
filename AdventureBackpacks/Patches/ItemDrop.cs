@@ -1,8 +1,6 @@
 using AdventureBackpacks.Assets;
-using AdventureBackpacks.Assets.Items;
 using AdventureBackpacks.Components;
 using HarmonyLib;
-using UnityEngine;
 using Vapok.Common.Managers;
 
 namespace AdventureBackpacks.Patches;
@@ -37,24 +35,6 @@ public class ItemDropPatches
             var inventoryWeight = backpackItem.GetInventory()?.GetTotalWeight() ?? 0;
 
             __result += inventoryWeight * backpack.WeightMultiplier.Value;
-        }
-    }
-
-    [HarmonyPatch(typeof(ItemDrop.ItemData), nameof(ItemDrop.ItemData.GetIcon))]
-    static class ItemDataGetIconIronHdBackpack
-    {
-        // Postfix rather than a skipping prefix: vanilla keeps running, we only swap the result.
-        static void Postfix(ItemDrop.ItemData __instance, ref Sprite __result)
-        {
-            if (!IronBackpackIconFix.IsIronHdBackpack(__instance))
-                return;
-
-            var icon = IronBackpackIconFix.GetOrCreateIcon();
-            if (icon == null)
-                return;
-
-            __result = icon;
-            IronBackpackIconFix.NotifyGetIconOverride(__instance);
         }
     }
 }
