@@ -1,3 +1,4 @@
+using AdventureBackpacks.Compats;
 using AdventureBackpacks.Components;
 using AdventureBackpacks.Patches;
 using UnityEngine;
@@ -7,45 +8,47 @@ namespace AdventureBackpacks.Extensions;
 
 public static class PlayerExtensions
 {
-    public static bool IsBackpackEquipped(this Player player)
+    /// <summary>
+    /// The single place that answers "which item is this player wearing as a backpack".
+    /// With EquipmentAndQuickSlots active the dedicated backpack slot wins; otherwise, and always
+    /// for remote players, the vanilla shoulder slot is used.
+    /// </summary>
+    public static ItemDrop.ItemData GetEquippedBackpackItem(this Player player)
     {
         if (player == null || player.GetInventory() == null)
-            return false;
-            
-        if (player.m_shoulderItem == null)
-            return false;
+            return null;
 
-        return player.m_shoulderItem.IsBackpack();
+        // The EQS API only ever reports the local player's slots.
+        if (EquipmentAndQuickSlotsCompat.IsAvailable && player == Player.m_localPlayer)
+        {
+            var slotItem = EquipmentAndQuickSlotsCompat.GetSlotItem();
+            if (slotItem != null && slotItem.IsBackpack())
+                return slotItem;
+        }
+
+        var shoulderItem = player.m_shoulderItem;
+
+        if (shoulderItem == null || !shoulderItem.IsBackpack())
+            return null;
+
+        return shoulderItem;
+    }
+
+    public static bool IsBackpackEquipped(this Player player)
+    {
+        return player.GetEquippedBackpackItem() != null;
     }
 
     public static bool IsThisBackpackEquipped(this Player player, ItemDrop.ItemData itemData )
     {
-        if (player == null || player.GetInventory() == null)
-            return false;
-            
-        if (player.m_shoulderItem == null)
-            return false;
+        var equipped = player.GetEquippedBackpackItem();
 
-        if (!player.m_shoulderItem.IsBackpack())
-            return false;
-        
-        return player.m_shoulderItem.Equals(itemData);
+        return equipped != null && equipped.Equals(itemData);
     }
 
     public static BackpackComponent GetEquippedBackpack(this Player player)
     {
-        if (player == null || player.GetInventory() == null)
-            return null;
-            
-        if (player.m_shoulderItem == null)
-            return null;
-
-        if (player.m_shoulderItem.IsBackpack())
-        {
-            return player.m_shoulderItem.Data().GetOrCreate<BackpackComponent>();
-        }
-        // Return null if no backpacks are found.
-        return null;
+        return player.GetEquippedBackpackItem()?.Data().GetOrCreate<BackpackComponent>();
     }
 
     public static bool CanOpenBackpack(this Player player)

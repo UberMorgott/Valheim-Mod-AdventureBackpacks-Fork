@@ -33,13 +33,14 @@ namespace AdventureBackpacks
     [BepInDependency("com.ValheimModding.YamlDotNetDetector")]
     [BepInDependency("com.chebgonaz.ChebsNecromancy",BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.maxsch.valheim.contentswithin", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(EquipmentAndQuickSlotsCompat.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
     public class AdventureBackpacks : BaseUnityPlugin, IPluginInfo
     {
         //Module Constants
         private const string _pluginId = "vapok.mods.adventurebackpacks";
         private const string _displayName = "Adventure Backpacks";
-        private const string _version = "1.9.13.1";
+        private const string _version = "1.9.13.2";
         
         //Interface Properties
         public string PluginId => _pluginId;
@@ -89,9 +90,20 @@ namespace AdventureBackpacks
 
             PrefabManager.Initalized = true;
            
-            //Patch Harmony
+            //Patch Harmony one class at a time: a single stale target must not abort Awake and
+            //silently disable every other patch in the mod.
             _harmony = new Harmony(Info.Metadata.GUID);
-            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+            foreach (var patchClass in AccessTools.GetTypesFromAssembly(Assembly.GetExecutingAssembly()))
+            {
+                try
+                {
+                    _harmony.CreateClassProcessor(patchClass).Patch();
+                }
+                catch (Exception e)
+                {
+                    _log.Error($"Harmony patch class {patchClass.FullName} failed to apply, skipping it: {e.Message}");
+                }
+            }
 
             //Compatibilities
             if (Chainloader.PluginInfos.ContainsKey("com.chebgonaz.ChebsNecromancy"))
@@ -103,6 +115,8 @@ namespace AdventureBackpacks
             {
                 ContentsWithin.Awake(_harmony,"com.maxsch.valheim.contentswithin");
             }
+
+            EquipmentAndQuickSlotsCompat.Initialize();
             
             //???
 

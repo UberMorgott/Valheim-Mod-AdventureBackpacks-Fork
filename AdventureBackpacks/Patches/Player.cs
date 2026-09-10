@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
-using System.Threading;
+using AdventureBackpacks.Compats;
 using HarmonyLib;
 
 namespace AdventureBackpacks.Patches;
@@ -14,6 +14,10 @@ public class PlayerPatches
         static void Postfix(Player __instance)
         {
             __instance.gameObject.AddComponent<Container>();
+
+            // First Player.Awake is the earliest point where EquipmentAndQuickSlots' Slots exist.
+            // The call is a no-op after the first successful registration.
+            EquipmentAndQuickSlotsCompat.RegisterSlot();
         }
     }
 
@@ -72,70 +76,30 @@ public class PlayerPatches
     static class PlayerHaveRequirementItemsPatch
     {
         
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilGenerator)
+        // Anchored on the real call to Inventory.CountItems(string,int,bool).
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var patchedSuccess = false;
-            
-            var instrs = instructions.ToList();
-
-            var counter = 0;
-
-            CodeInstruction LogMessage(CodeInstruction instruction)
-            {
-                AdventureBackpacks.Log.Debug($"IL_{counter}: Opcode: {instruction.opcode} Operand: {instruction.operand}");
-                return instruction;
-            }
-
-            var ldArgInstruction = new CodeInstruction(OpCodes.Ldarg_0);
             var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) });
 
-            
-            for (int i = 0; i < instrs.Count; ++i)
-            {
-                if (i > 5 && instrs[i].opcode == OpCodes.Stloc_S && instrs[i + 1].opcode == OpCodes.Ldloc_S && instrs[i + 2].opcode == OpCodes.Ldloc_S && instrs[i - 1].opcode == OpCodes.Callvirt)
-                {
-                    //Move Any Labels from the instruction position being patched to new instruction.
-                    if (instrs[i].labels.Count > 0)
-                        instrs[i].MoveLabelsTo(ldArgInstruction);
+            var matcher = new CodeMatcher(instructions)
+                .MatchStartForward(new CodeMatch(OpCodes.Callvirt, countItemsMethod), new CodeMatch(OpCodes.Stloc_S));
 
-                    yield return LogMessage(instrs[i]);
-                    counter++;
-          
-                    //Player this
-                    yield return LogMessage(ldArgInstruction);
-                    counter++;
-                    
-                    //Piece.Requirement resource
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_2));
-                    counter++;
-                    
-                    //int num
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_S, instrs[i].operand));
-                    counter++;
-          
-                    //Patch Calling Method
-                    yield return LogMessage(new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(AdjustCountIfEquipped))));
-                    counter++;
-
-                    //Save output of calling method to local variable 0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Stloc_S, instrs[i].operand));
-                    counter++;
-                    
-                    patchedSuccess = true;
-                    
-                }
-                else
-                {
-                    yield return LogMessage(instrs[i]);
-                    counter++;
-                }
-            }
-            
-            if (!patchedSuccess)
+            if (matcher.IsInvalid)
             {
-                AdventureBackpacks.Log.Error($"{nameof(Player.HaveRequirementItems)} Transpiler Failed To Patch");
-                Thread.Sleep(5000);
+                AdventureBackpacks.Log.Error($"{nameof(Player.HaveRequirementItems)} transpiler: anchor Inventory.CountItems(string,int,bool) not found. Crafting requirements will not account for an equipped backpack.");
+                return instructions;
             }
+
+            matcher.Advance(1);
+            var numLocal = matcher.Operand;
+
+            return matcher.Advance(1).Insert(
+                    new CodeInstruction(OpCodes.Ldarg_0),                        // Player this
+                    new CodeInstruction(OpCodes.Ldloc_2),                        // Piece.Requirement resource
+                    new CodeInstruction(OpCodes.Ldloc_S, numLocal),              // int num
+                    new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(AdjustCountIfEquipped))),
+                    new CodeInstruction(OpCodes.Stloc_S, numLocal))
+                .Instructions();
         }
     }
     
@@ -143,64 +107,31 @@ public class PlayerPatches
     static class PlayerConsumeResourcesPatch
     {
         
+        // Anchored on the real call to Piece.Requirement.GetAmount(int).
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var patchedSuccess = false;
-            var instrs = instructions.ToList();
+            var getAmountMethod = AccessTools.DeclaredMethod(typeof(Piece.Requirement), "GetAmount", new[] { typeof(int) });
 
-            var counter = 0;
+            var matcher = new CodeMatcher(instructions)
+                .MatchStartForward(
+                    new CodeMatch(OpCodes.Callvirt, getAmountMethod),
+                    new CodeMatch(OpCodes.Ldarg_S),
+                    new CodeMatch(OpCodes.Mul),
+                    new CodeMatch(OpCodes.Stloc_3));
 
-            CodeInstruction LogMessage(CodeInstruction instruction)
+            if (matcher.IsInvalid)
             {
-                AdventureBackpacks.Log.Debug($"IL_{counter}: Opcode: {instruction.opcode} Operand: {instruction.operand}");
-                return instruction;
+                AdventureBackpacks.Log.Error($"{nameof(Player.ConsumeResources)} transpiler: anchor Piece.Requirement.GetAmount(int) not found. Crafting may consume an equipped backpack.");
+                return instructions;
             }
 
-            var ldArgInstruction = new CodeInstruction(OpCodes.Ldarg_0);
-            var getAmountMethod = AccessTools.DeclaredMethod(typeof(Piece.Requirement), "GetAmount", new[] { typeof(int) }); 
-
-            for (int i = 0; i < instrs.Count; ++i)
-            {
-
-                yield return LogMessage(instrs[i]);
-                counter++;
-
-                if (i > 5 && instrs[i].opcode == OpCodes.Stloc_3 && instrs[i-1].opcode == OpCodes.Mul && instrs[i-2].opcode == OpCodes.Ldarg_S
-                    && instrs[i-3].opcode == OpCodes.Callvirt && instrs[i-3].operand.Equals(getAmountMethod))
-                {
-                    //Move Any Labels from the instruction position being patched to new instruction.
-                    if (instrs[i].labels.Count > 0)
-                        instrs[i].MoveLabelsTo(ldArgInstruction);
-          
-                    //Player this
-                    yield return LogMessage(ldArgInstruction);
-                    counter++;
-                    
-                    //Piece.Requirement resource
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_2));
-                    counter++;
-                    
-                    //int amount
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_3));
-                    counter++;
-          
-                    //Patch Calling Method
-                    yield return LogMessage(new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(ConsumeUnEquippedItems))));
-                    counter++;
-
-                    //Save output of calling method to local variable 0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Stloc_3));
-                    counter++;
-                    
-                    patchedSuccess = true;
-                }
-            }
-            
-            if (!patchedSuccess)
-            {
-                AdventureBackpacks.Log.Error($"{nameof(Player.ConsumeResources)} Transpiler Failed To Patch");
-                Thread.Sleep(5000);
-            }
+            return matcher.Advance(4).Insert(
+                    new CodeInstruction(OpCodes.Ldarg_0),                        // Player this
+                    new CodeInstruction(OpCodes.Ldloc_2),                        // Piece.Requirement resource
+                    new CodeInstruction(OpCodes.Ldloc_3),                        // int amount
+                    new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(ConsumeUnEquippedItems))),
+                    new CodeInstruction(OpCodes.Stloc_3))
+                .Instructions();
         }
     }
 }

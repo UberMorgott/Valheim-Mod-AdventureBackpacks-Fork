@@ -188,6 +188,7 @@
         <Compile Include="Assets\Effects\ExternalEffect.cs" />
         <Compile Include="Assets\Items\BackpackItems\ExternalBackpack.cs" />
         <Compile Include="Compats\ChebsNecromancy.cs" />
+    <Compile Include="Compats\EquipmentAndQuickSlotsCompat.cs" />
         <Compile Include="Compats\APIManagerPatcher.cs" />
         <Compile Include="Features\Utilities.cs" />
         <EmbeddedResource Include="Assets\Bundles\chebsbackpack" />

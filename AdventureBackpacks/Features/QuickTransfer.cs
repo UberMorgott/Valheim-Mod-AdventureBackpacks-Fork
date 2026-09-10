@@ -82,7 +82,11 @@ public static class QuickTransfer
                             return;
                         break;
                     case ItemDrop.ItemData.ItemType.Shoulder:
-                        if (Player.m_localPlayer.m_shoulderItem == null)
+                        // A backpack may live in the EquipmentAndQuickSlots backpack slot rather than
+                        // in the vanilla shoulder slot, so ask the helper for backpacks.
+                        if (item.IsBackpack()
+                                ? Player.m_localPlayer.GetEquippedBackpackItem() == null
+                                : Player.m_localPlayer.m_shoulderItem == null)
                             return;
                         break;
                     case ItemDrop.ItemData.ItemType.Utility:
