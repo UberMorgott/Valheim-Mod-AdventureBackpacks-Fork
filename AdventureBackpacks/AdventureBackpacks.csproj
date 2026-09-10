@@ -129,13 +129,15 @@
         <Reference Include="UnityEngine.UI">
             <HintPath>..\..\References\Valheim\0.221.12\Managed\UnityEngine.UI.dll</HintPath>
         </Reference>
-        <!-- NuGet package: used for Debug, Release, API -->
-        <!-- Local config: use DLL built from Vapok.Common project (build Common first, then build this) -->
+        <!-- Vapok.Common is forked locally (E:\DEV\Valheim\Vapok.Common): the NuGet build's
+             ItemInfo type initializer patches Inventory.AddItem overloads that no longer exist
+             in Valheim 1.0.7, which poisons ItemInfo and kills every ItemData.Data() call.
+             Local config uses the fork's Debug build, everything else its Release build. -->
         <Reference Include="Vapok.Valheim.Common, Version=2.11.2214.0, Culture=neutral, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'Local'">
           <HintPath>..\..\Vapok.Common\Vapok.Valheim.Common\bin\Debug\net48\Vapok.Valheim.Common.dll</HintPath>
         </Reference>
         <Reference Include="Vapok.Valheim.Common, Version=2.11.2214.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\Vapok.Valheim.Common.2.11.22112\lib\net48\Vapok.Valheim.Common.dll</HintPath>
+          <HintPath>..\..\Vapok.Common\Vapok.Valheim.Common\bin\Release\net48\Vapok.Valheim.Common.dll</HintPath>
         </Reference>
         <Reference Include="YamlDotNet, Version=16.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
           <HintPath>..\packages\YamlDotNet.16.3.0\lib\net47\YamlDotNet.dll</HintPath>
