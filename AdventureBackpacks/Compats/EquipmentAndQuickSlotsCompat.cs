@@ -28,8 +28,17 @@ public static class EquipmentAndQuickSlotsCompat
     /// <summary>True once EQS was found and its API resolved. Cached, never reflected per frame.</summary>
     public static bool IsAvailable => _tryGetSlotItem != null;
 
+    private static bool _initialized;
+
+    // Deliberately NOT called from Awake: without a BepInDependency edge (which would close a
+    // load-order cycle) EQS may not be in PluginInfos yet. Player.Awake is late enough for both.
     public static void Initialize()
     {
+        if (_initialized)
+            return;
+
+        _initialized = true;
+
         if (!Chainloader.PluginInfos.ContainsKey(PluginGuid))
             return;
 
@@ -77,6 +86,8 @@ public static class EquipmentAndQuickSlotsCompat
     /// <summary>Registers the backpack slot once. Safe to call on every Player.Awake.</summary>
     public static void RegisterSlot()
     {
+        Initialize();
+
         if (_registrationAttempted || _addSlot == null)
             return;
 

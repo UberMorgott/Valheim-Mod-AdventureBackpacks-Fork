@@ -33,14 +33,13 @@ namespace AdventureBackpacks
     [BepInDependency("com.ValheimModding.YamlDotNetDetector")]
     [BepInDependency("com.chebgonaz.ChebsNecromancy",BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.maxsch.valheim.contentswithin", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(EquipmentAndQuickSlotsCompat.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
-    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
+        [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
     public class AdventureBackpacks : BaseUnityPlugin, IPluginInfo
     {
         //Module Constants
         private const string _pluginId = "vapok.mods.adventurebackpacks";
         private const string _displayName = "Adventure Backpacks";
-        private const string _version = "1.9.13.2";
+        private const string _version = "1.9.13.3";
         
         //Interface Properties
         public string PluginId => _pluginId;
@@ -116,8 +115,9 @@ namespace AdventureBackpacks
                 ContentsWithin.Awake(_harmony,"com.maxsch.valheim.contentswithin");
             }
 
-            EquipmentAndQuickSlotsCompat.Initialize();
-            
+            // EQS is detected lazily on the first Player.Awake: a BepInDependency edge here would
+            // close a cycle (EQS -> EpicLoot -> AdventureBackpacks) and kill the whole chainloader.
+
             //???
 
             //Profit
