@@ -1,12 +1,37 @@
-# Adventure Backpacks HD — graphics fork
+# Adventure Backpacks — Morgott's personal fork
 
-This repository is a **fork of [Adventure Backpacks](https://github.com/Vapok/AdventureBackpacks)** by **Vapok** — an excellent Valheim mod that adds progression-based backpacks, inventory, effects, and a full API. **Gameplay, balance, recipes, and features are unchanged here.** The goal of this fork is **higher-fidelity graphics** for selected backpacks (starting with the Rugged / iron HD pack), not new mechanics.
+**Personal fork for Valheim 1.0.7**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
+Plugin version **1.9.13.2**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+equipped backpacks keep working.
 
-Upstream project: [github.com/Vapok/AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) · Community: [Vapok's Mods Discord](https://discord.gg/5YAJkRFBXt)
+Credit where it is due:
+
+- **Original mod and all gameplay design:** **Vapok** (Pete Navarra) — [github.com/Vapok/AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) · [Vapok's Mods Discord](https://discord.gg/5YAJkRFBXt)
+- **HD backpack assets:** **psionprime**, from [AdventureBackpacksHD](https://github.com/psionprime/AdventureBackpacksHD)
+- **This fork:** Valheim 1.0.7 compatibility, patch robustness, and EquipmentAndQuickSlots integration
+
+Licensed under the MIT licence of the upstream project. `LICENSE.md` carries Vapok's copyright notice and is
+preserved unchanged, as the licence requires.
+
+This fork is not published to Thunderstore. `manifest.json` still reports the upstream package version `1.9.13`
+because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.2`.
 
 ---
 
-## What we changed (Jul 2026)
+## What this fork changes on top of the HD fork (Sep 2026)
+
+| Area | Summary |
+|------|---------|
+| **Valheim 1.0.7 targets** | Harmony patch targets resolved against the real 1.0.7 assembly: `Inventory.AddItem` 10-argument overload, `Inventory.IsTeleportable(bool)`, `InventoryElement.Position`. |
+| **Patch isolation** | Harmony patches are applied class by class inside a try/catch. One stale target now logs its class name and is skipped instead of aborting `Awake` and silently disabling every other patch. |
+| **Foreign exceptions** | The finalizer on `InventoryGui.OnSelectedItem` only swallows its own backpack NRE. Any other mod's exception is logged and rethrown untouched. |
+| **Patch hygiene** | `EnvMan.IsCold`, `EnvMan.IsWet`, `ItemDrop.ItemData.GetIcon` and `ItemDrop.ItemData.GetWeight` are postfixes rather than skipping prefixes or transpilers. The remaining transpilers are anchored with `CodeMatcher` on real method calls and log an explicit error when the anchor is gone. |
+| **Cheaper hot path** | The `SEMan.RemoveStatusEffect` prefix returns early for anything that is not the local player's `SEMan`. |
+| **EquipmentAndQuickSlots** | Optional integration: with EQS installed, backpacks get their own `Backpack` equipment slot instead of competing with capes. Detected by reflection, no assembly reference, and the vanilla `ItemType.Shoulder` path still works without EQS. |
+
+---
+
+## What the HD fork changed (Jul 2026, psionprime)
 
 Work lives under **`AdventureBackpacksHD/`** in this workspace. Detailed build/deploy notes: **[`advice.md`](../advice.md)** (workspace root).
 

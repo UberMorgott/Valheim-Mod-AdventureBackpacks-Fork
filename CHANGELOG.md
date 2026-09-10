@@ -1,3 +1,18 @@
+# 1.9.13.2 - Morgott's fork: patch robustness and EquipmentAndQuickSlots
+Personal fork for Valheim 1.0.7 maintained by Morgott (UberMorgott). Original mod by Vapok, HD assets by psionprime.
+* Harmony patches are applied class by class inside a try/catch. A single stale target now logs its class name and is
+  skipped, instead of aborting Awake and silently disabling every other patch in the mod.
+* The finalizer on InventoryGui.OnSelectedItem no longer swallows other mods' exceptions. It returns null only for its
+  own backpack NullReferenceException case and rethrows everything else.
+* SEMan.RemoveStatusEffect prefix returns early unless the SEMan belongs to the local player.
+* EnvMan.IsCold, EnvMan.IsWet, ItemDrop.ItemData.GetIcon and ItemDrop.ItemData.GetWeight are postfixes now rather than
+  skipping prefixes or transpilers.
+* Remaining transpilers are anchored with CodeMatcher on real method calls (Inventory.CountItems,
+  Piece.Requirement.GetAmount, the HashSet<StatusEffect> constructor) and log an explicit error when the anchor is gone.
+* InventoryGrid.DropItem prefix reads __runOriginal and no longer arms its move flag when another mod already cancelled.
+* Optional EquipmentAndQuickSlots integration: with EQS installed, backpacks get their own "Backpack" equipment slot.
+  Detected by reflection, no assembly reference, and the vanilla ItemType.Shoulder path is unchanged without EQS.
+
 # 1.9.13 - Refreshed Drop Lists & Bugfixes
 * Refreshed Drop Lists for All Backpacks
   * All Biome Bosses through Plains now have a drop change by default.

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AdventureBackpacks")]
-[assembly: AssemblyDescription("A Valheim Mod for adding progression multiple backpacks as an item/utility gear addition.")]
+[assembly: AssemblyDescription("A Valheim Mod for adding progression multiple backpacks as an item/utility gear addition. Personal fork for Valheim 1.0.7, maintained by Morgott (UberMorgott). HD assets by psionprime.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vapok Gaming")]
 [assembly: AssemblyProduct("AdventureBackpacks")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyCopyright("Copyright (c) 2023 Pete Navarra (Vapok). MIT licence. Fork maintained by Morgott (UberMorgott).")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,8 +32,8 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 #if ! API
-[assembly: AssemblyVersion("1.9.13.1")]
-[assembly: AssemblyFileVersion("1.9.13.1")]
+[assembly: AssemblyVersion("1.9.13.2")]
+[assembly: AssemblyFileVersion("1.9.13.2")]
 #else
 [assembly: AssemblyVersion("1.2.0")]
 [assembly: AssemblyFileVersion("1.2.0")]
