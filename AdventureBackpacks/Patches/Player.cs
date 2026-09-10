@@ -72,65 +72,107 @@ public class PlayerPatches
         return num - removedCounter;
     }
 
+    // Local slots differ per method and shift between game versions, so the transpilers below read
+    // them out of the real IL instead of hardcoding indices. In 1.0.7 the loop variable is loc 3,
+    // not loc 2, and the amount is stloc.s 4, not stloc.3 — those stale indices are exactly what
+    // made ConsumeResources fail to match and HaveRequirementItems fail to compile.
+    private static CodeInstruction LoadLocal(CodeInstruction store)
+    {
+        if (store.opcode == OpCodes.Stloc_0) return new CodeInstruction(OpCodes.Ldloc_0);
+        if (store.opcode == OpCodes.Stloc_1) return new CodeInstruction(OpCodes.Ldloc_1);
+        if (store.opcode == OpCodes.Stloc_2) return new CodeInstruction(OpCodes.Ldloc_2);
+        if (store.opcode == OpCodes.Stloc_3) return new CodeInstruction(OpCodes.Ldloc_3);
+        return new CodeInstruction(store.opcode == OpCodes.Stloc_S ? OpCodes.Ldloc_S : OpCodes.Ldloc, store.operand);
+    }
+
+    // `foreach (Piece.Requirement r in resources)` stores the current element right after ldelem.ref.
+    private static CodeInstruction LoadRequirement(List<CodeInstruction> code, int anchor)
+    {
+        for (var i = anchor; i > 0; i--)
+        {
+            if (code[i - 1].opcode == OpCodes.Ldelem_Ref && code[i].IsStloc())
+                return LoadLocal(code[i]);
+        }
+
+        return null;
+    }
+
     [HarmonyPatch(typeof(Player), nameof(Player.HaveRequirementItems))]
     static class PlayerHaveRequirementItemsPatch
     {
-        
+
         // Anchored on the real call to Inventory.CountItems(string,int,bool).
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) });
+            var code = instructions.ToList();
 
-            var matcher = new CodeMatcher(instructions)
-                .MatchStartForward(new CodeMatch(OpCodes.Callvirt, countItemsMethod), new CodeMatch(OpCodes.Stloc_S));
+            var matcher = new CodeMatcher(code)
+                .MatchStartForward(new CodeMatch(OpCodes.Callvirt, countItemsMethod), new CodeMatch(i => i.IsStloc()));
 
             if (matcher.IsInvalid)
             {
                 AdventureBackpacks.Log.Error($"{nameof(Player.HaveRequirementItems)} transpiler: anchor Inventory.CountItems(string,int,bool) not found. Crafting requirements will not account for an equipped backpack.");
-                return instructions;
+                return code;
             }
 
-            matcher.Advance(1);
-            var numLocal = matcher.Operand;
+            var requirement = LoadRequirement(code, matcher.Pos);
+            if (requirement == null)
+            {
+                AdventureBackpacks.Log.Error($"{nameof(Player.HaveRequirementItems)} transpiler: Piece.Requirement loop local not found. Crafting requirements will not account for an equipped backpack.");
+                return code;
+            }
+
+            var countStore = matcher.Advance(1).Instruction;
 
             return matcher.Advance(1).Insert(
                     new CodeInstruction(OpCodes.Ldarg_0),                        // Player this
-                    new CodeInstruction(OpCodes.Ldloc_2),                        // Piece.Requirement resource
-                    new CodeInstruction(OpCodes.Ldloc_S, numLocal),              // int num
+                    requirement,                                                 // Piece.Requirement resource
+                    LoadLocal(countStore),                                       // int num
                     new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(AdjustCountIfEquipped))),
-                    new CodeInstruction(OpCodes.Stloc_S, numLocal))
+                    new CodeInstruction(countStore.opcode, countStore.operand))
                 .Instructions();
         }
     }
-    
+
     [HarmonyPatch(typeof(Player), nameof(Player.ConsumeResources))]
     static class PlayerConsumeResourcesPatch
     {
-        
+
         // Anchored on the real call to Piece.Requirement.GetAmount(int).
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var getAmountMethod = AccessTools.DeclaredMethod(typeof(Piece.Requirement), "GetAmount", new[] { typeof(int) });
+            var code = instructions.ToList();
 
-            var matcher = new CodeMatcher(instructions)
+            var matcher = new CodeMatcher(code)
                 .MatchStartForward(
                     new CodeMatch(OpCodes.Callvirt, getAmountMethod),
                     new CodeMatch(OpCodes.Ldarg_S),
                     new CodeMatch(OpCodes.Mul),
-                    new CodeMatch(OpCodes.Stloc_3));
+                    new CodeMatch(i => i.IsStloc()));
 
             if (matcher.IsInvalid)
             {
                 AdventureBackpacks.Log.Error($"{nameof(Player.ConsumeResources)} transpiler: anchor Piece.Requirement.GetAmount(int) not found. Crafting may consume an equipped backpack.");
-                return instructions;
+                return code;
             }
 
-            return matcher.Advance(4).Insert(
+            var requirement = LoadRequirement(code, matcher.Pos);
+            if (requirement == null)
+            {
+                AdventureBackpacks.Log.Error($"{nameof(Player.ConsumeResources)} transpiler: Piece.Requirement loop local not found. Crafting may consume an equipped backpack.");
+                return code;
+            }
+
+            var amountStore = matcher.Advance(3).Instruction;
+
+            return matcher.Advance(1).Insert(
                     new CodeInstruction(OpCodes.Ldarg_0),                        // Player this
-                    new CodeInstruction(OpCodes.Ldloc_2),                        // Piece.Requirement resource
-                    new CodeInstruction(OpCodes.Ldloc_3),                        // int amount
+                    requirement,                                                 // Piece.Requirement resource
+                    LoadLocal(amountStore),                                      // int amount
                     new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(ConsumeUnEquippedItems))),
-                    new CodeInstruction(OpCodes.Stloc_3))
+                    new CodeInstruction(amountStore.opcode, amountStore.operand))
                 .Instructions();
         }
     }
