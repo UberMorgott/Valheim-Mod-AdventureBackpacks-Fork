@@ -1,7 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Threading;
 using AdventureBackpacks.Assets;
 using AdventureBackpacks.Assets.Items;
 using AdventureBackpacks.Components;
@@ -14,122 +10,51 @@ namespace AdventureBackpacks.Patches;
 public class ItemDropPatches
 {
     [HarmonyPatch(typeof(ItemDrop.ItemData), nameof(ItemDrop.ItemData.GetWeight))]
-    static class ItemDataGetWeightTranspiler
+    static class ItemDataGetWeightPatch
     {
-        public static float OverrideBackpackWeight(ItemDrop.ItemData item, float originalWeight)
+        // Vanilla returns item weight scaled by stack and quality. A backpack additionally carries the
+        // weight of its own inventory, so we only need the result - no IL rewriting required.
+        static void Postfix(ItemDrop.ItemData __instance, ref float __result)
         {
-            var returnedWeight = originalWeight;
+            if (__instance?.m_shared == null || string.IsNullOrEmpty(__instance.m_shared.m_name))
+                return;
 
-            if (!string.IsNullOrEmpty(item.m_shared.m_name) && item.TryGetBackpackItem(out var backpack))
+            if (!__instance.TryGetBackpackItem(out var backpack))
+                return;
+
+            var backpackItem = __instance.Data().GetOrCreate<BackpackComponent>();
+
+            var size = backpack.GetInventorySize(backpackItem.Item.m_quality);
+
+            if (!backpackItem.IsEmptyingBackpack && backpackItem.InventoryNeedsValidating(size))
             {
-                    
-                // If the item in GetWeight() is a backpack, call GetTotalWeight() on its Inventory.
-                // Note that GetTotalWeight() just returns a the value of m_totalWeight, and doesn't do any calculation on its own.
-                // If the Inventory has been changed at any point, it calls UpdateTotalWeight(), which should ensure that its m_totalWeight is accurate.
-                var backpackItem = item.Data().GetOrCreate<BackpackComponent>();
-
-                var size = backpack.GetInventorySize(backpackItem.Item.m_quality);
-                
-                if (!backpackItem.IsEmptyingBackpack && backpackItem.InventoryNeedsValidating(size))
-                {
-                    AdventureBackpacks.Log.Debug($"[GetWeight() - Item Name: {item.m_shared.m_name}");
-                    AdventureBackpacks.Log.Debug($"[GetWeight() - Backpack Item: {backpackItem.Item.m_shared.m_name}");
-                    AdventureBackpacks.Log.Debug($"[GetWeight() - Backpack: {backpack.ItemName}");
-                    Backpacks.ValidateBackpackInventorySizing(Player.m_localPlayer, backpackItem.Item);
-                }
-                
-                var inventoryWeight = backpackItem.GetInventory()?.GetTotalWeight() ?? 0;
-
-                // To the backpack's item weight, add the backpack's inventory weight multiplied by the weightMultiplier in the configs.
-                returnedWeight += inventoryWeight * backpack.WeightMultiplier.Value;
+                AdventureBackpacks.Log.Debug($"[GetWeight() - Item Name: {__instance.m_shared.m_name}");
+                AdventureBackpacks.Log.Debug($"[GetWeight() - Backpack: {backpack.ItemName}");
+                Backpacks.ValidateBackpackInventorySizing(Player.m_localPlayer, backpackItem.Item);
             }
 
-            return returnedWeight;
-        }
-        
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            var patchedSuccess = false;
-            
-            var instrs = instructions.ToList();
+            // GetTotalWeight() just returns the cached m_totalWeight, which Inventory keeps up to date.
+            var inventoryWeight = backpackItem.GetInventory()?.GetTotalWeight() ?? 0;
 
-            var counter = 0;
-
-            CodeInstruction LogMessage(CodeInstruction instruction)
-            {
-                AdventureBackpacks.Log.Debug($"IL_{counter}: Opcode: {instruction.opcode} Operand: {instruction.operand}");
-                return instruction;
-            }
-
-            var scaleWeightByQualityField = AccessTools.DeclaredField(typeof(ItemDrop.ItemData.SharedData),"m_scaleWeightByQuality");
-
-            for (int i = 0; i < instrs.Count; ++i)
-            {
-                if (i > 6 && instrs[i].opcode == OpCodes.Ldloc_1 && instrs[i-1].opcode == OpCodes.Stloc_1 && instrs[i-2].opcode == OpCodes.Add &&
-                    instrs[i - 3].opcode == OpCodes.Mul && instrs[i - 4].opcode == OpCodes.Ldfld &&
-                    instrs[i - 4].operand.Equals(scaleWeightByQualityField))
-                {
-                    //Call to Hide Backpack
-                    var ldArgInstruction = new CodeInstruction(OpCodes.Ldarg_0);
-                    //Move Any Labels from the instruction position being patched to new instruction.
-                    if (instrs[i].labels.Count > 0)
-                        instrs[i].MoveLabelsTo(ldArgInstruction);
-
-                    //Insert new instructions first.
-
-                    //Patch ldarg_0 this is instance of ItemData.
-                    yield return LogMessage(ldArgInstruction);
-                    counter++;
-                    
-                    //Get Weight which is ldloc0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_1));
-                    counter++;
-
-                    //Patch Call Method for Overriding the Weight.
-                    yield return LogMessage(new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(ItemDataGetWeightTranspiler), nameof(OverrideBackpackWeight))));
-                    counter++;
-                    
-                    //Set Weight which is stloc0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Stloc_1));
-                    counter++;
-                    
-                    //Output current Operation
-                    yield return LogMessage(instrs[i]);
-                    counter++;
-                    
-                    patchedSuccess = true;
-                } 
-                else
-                {
-                    yield return LogMessage(instrs[i]);
-                    counter++;
-                }
-            }
-
-            if (!patchedSuccess)
-            {
-                AdventureBackpacks.Log.Error($"{nameof(ItemDrop.ItemData.GetWeight)} Transpiler Failed To Patch");
-                Thread.Sleep(5000);
-            }
+            __result += inventoryWeight * backpack.WeightMultiplier.Value;
         }
     }
 
     [HarmonyPatch(typeof(ItemDrop.ItemData), nameof(ItemDrop.ItemData.GetIcon))]
     static class ItemDataGetIconIronHdBackpack
     {
-        static bool Prefix(ItemDrop.ItemData __instance, ref Sprite __result)
+        // Postfix rather than a skipping prefix: vanilla keeps running, we only swap the result.
+        static void Postfix(ItemDrop.ItemData __instance, ref Sprite __result)
         {
             if (!IronBackpackIconFix.IsIronHdBackpack(__instance))
-                return true;
+                return;
 
             var icon = IronBackpackIconFix.GetOrCreateIcon();
             if (icon == null)
-                return true;
+                return;
 
             __result = icon;
             IronBackpackIconFix.NotifyGetIconOverride(__instance);
-            return false;
         }
     }
-
 }

@@ -276,8 +276,13 @@ public static class InventoryPatches
     [HarmonyPriority(Priority.First)]
     static class InventoryGridDropItemPatch
     {
-        static bool Prefix(InventoryGrid __instance, Inventory fromInventory, ItemDrop.ItemData item, int amount, Vector2i pos)
+        static bool Prefix(InventoryGrid __instance, Inventory fromInventory, ItemDrop.ItemData item, int amount, Vector2i pos, bool __runOriginal)
         {
+            // Another mod already cancelled the original. Do not arm _movingItemBetweenContainers,
+            // it would never be cleared and would stick for every later move.
+            if (!__runOriginal)
+                return false;
+
             var itemAt = __instance.m_inventory.GetItemAt(pos.x, pos.y);
             
             if (itemAt == item)

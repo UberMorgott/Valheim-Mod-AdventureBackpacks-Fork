@@ -89,13 +89,14 @@ internal static class InventoryGuiPatches
                             return null;
                     }
                 }
-                AdventureBackpacks.Log.Warning($"The following error was captured by Adventure Backpacks, but was caused by another mod. Advanced Backpacks is going to allow the operation to continue, but is going to replay the error below:");
+                // Not our case: log it, then hand the exception back untouched. Swallowing it here
+                // would hide other mods' failures and leave them in an inconsistent state.
+                AdventureBackpacks.Log.Warning($"Adventure Backpacks saw an exception in InventoryGui.OnSelectedItem that is not its own. Rethrowing it:");
                 AdventureBackpacks.Log.Error($"External Mod Error Message: {__exception.Message}");
                 AdventureBackpacks.Log.Error($"External Mod Error Source: {__exception.Source}");
                 AdventureBackpacks.Log.Error($"External Mod Error Stack Trace: {__exception.StackTrace}");
-                AdventureBackpacks.Log.Warning($"Please check with other mod authors listed above.");
             }
-            return null;
+            return __exception;
         }
     }
 
@@ -495,62 +496,31 @@ internal static class InventoryGuiPatches
     [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.SetupRequirement))]
     static class InventoryGuiSetupRequirementPatch
     {
+        // Anchored on the real call to Inventory.CountItems(string,int,bool) instead of raw opcode
+        // index arithmetic, so a shifted method body fails loudly rather than silently no-opping.
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var patchedSuccess = false;
-            var instrs = instructions.ToList();
+            var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) });
 
-            var counter = 0;
+            var matcher = new CodeMatcher(instructions)
+                .MatchStartForward(new CodeMatch(OpCodes.Callvirt, countItemsMethod), new CodeMatch(OpCodes.Stloc_S));
 
-            CodeInstruction LogMessage(CodeInstruction instruction)
+            if (matcher.IsInvalid)
             {
-                AdventureBackpacks.Log.Debug($"IL_{counter}: Opcode: {instruction.opcode} Operand: {instruction.operand}");
-                return instruction;
+                AdventureBackpacks.Log.Error("InventoryGui.SetupRequirement transpiler: anchor Inventory.CountItems(string,int,bool) not found. Crafting requirements will not account for an equipped backpack.");
+                return instructions;
             }
 
-            var ldArgInstruction = new CodeInstruction(OpCodes.Ldarg_2);
-            var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) }); 
+            matcher.Advance(1);
+            var numLocal = matcher.Operand;
 
-            for (int i = 0; i < instrs.Count; ++i)
-            {
-
-                yield return LogMessage(instrs[i]);
-                counter++;
-
-                if (i > 5 && instrs[i-1].opcode == OpCodes.Callvirt && instrs[i-1].operand.Equals(countItemsMethod) && instrs[i].opcode == OpCodes.Stloc_S)
-                {
-                    //Move Any Labels from the instruction position being patched to new instruction.
-                    if (instrs[i].labels.Count > 0)
-                        instrs[i].MoveLabelsTo(ldArgInstruction);
-          
-                    //Player ldArg2
-                    yield return LogMessage(ldArgInstruction);
-                    counter++;
-                    
-                    //Piece.Requirement resource
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldarg_1));
-                    counter++;
-                    
-                    //int num
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldloc_S, instrs[i].operand));
-                    counter++;
-          
-                    //Patch Calling Method
-                    yield return LogMessage(new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(PlayerPatches.AdjustCountIfEquipped))));
-                    counter++;
-
-                    //Save output of calling method to local variable 0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Stloc_S, instrs[i].operand));
-                    counter++;
-
-                    patchedSuccess = true;
-                }
-            }
-            if (!patchedSuccess)
-            {
-                AdventureBackpacks.Log.Error($"InventoryGui.SetupRequirement Transpiler Failed To Patch");
-                Thread.Sleep(5000);
-            }
+            return matcher.Advance(1).Insert(
+                    new CodeInstruction(OpCodes.Ldarg_2),                        // Player player
+                    new CodeInstruction(OpCodes.Ldarg_1),                        // Piece.Requirement resource
+                    new CodeInstruction(OpCodes.Ldloc_S, numLocal),              // int num
+                    new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(PlayerPatches.AdjustCountIfEquipped))),
+                    new CodeInstruction(OpCodes.Stloc_S, numLocal))
+                .Instructions();
         }
     }
 }

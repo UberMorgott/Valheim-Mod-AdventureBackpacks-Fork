@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection.Emit;
-using System.Threading;
 using AdventureBackpacks.Assets;
 using AdventureBackpacks.Components;
 using AdventureBackpacks.Extensions;
@@ -17,61 +16,27 @@ public class HumanoidPatches
     [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.UpdateEquipmentStatusEffects))]
     static class HumanoidUpdateEquipmentStatusEffectsPatch
     {
+        // Local 0 is the "HashSet<StatusEffect> other" the method builds. Anchored on the real
+        // HashSet<StatusEffect> constructor call rather than on opcode index arithmetic.
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var patchedSuccess = false;
-            
-            var instrs = instructions.ToList();
+            var hashSetCtor = AccessTools.DeclaredConstructor(typeof(HashSet<StatusEffect>), new Type[0]);
 
-            var counter = 0;
+            var matcher = new CodeMatcher(instructions)
+                .MatchStartForward(new CodeMatch(OpCodes.Newobj, hashSetCtor), new CodeMatch(OpCodes.Stloc_0));
 
-            CodeInstruction LogMessage(CodeInstruction instruction)
+            if (matcher.IsInvalid)
             {
-                AdventureBackpacks.Log.Debug($"IL_{counter}: Opcode: {instruction.opcode} Operand: {instruction.operand}");
-                return instruction;
+                AdventureBackpacks.Log.Error($"{nameof(Humanoid.UpdateEquipmentStatusEffects)} transpiler: anchor new HashSet<StatusEffect>() not found. Backpack equipment effects will not be applied.");
+                return instructions;
             }
 
-            var ldlocInstruction = new CodeInstruction(OpCodes.Ldloc_0); 
-
-            for (int i = 0; i < instrs.Count; ++i)
-            {
-
-                yield return LogMessage(instrs[i]);
-                counter++;
-
-                //In Humanoid.UpdateEquipmentStatusEffects, Local Variable 0, or loc_0 is the target HashSet variable 
-                //listed as "other".  So, patching after Stloc_0 is called immediately after Newobj, which creates the object.
-                if (i > 0 && instrs[i].opcode == OpCodes.Stloc_0 && instrs[i - 1].opcode == OpCodes.Newobj)
-                {
-                    //Move Any Labels from the instruction position being patched to new instruction.
-                    if (instrs[i].labels.Count > 0)
-                        instrs[i].MoveLabelsTo(ldlocInstruction);
-          
-                    //Patch the ldloc_0 which is the argument of my method using local variable 0.
-                    yield return LogMessage(ldlocInstruction);
-                    counter++;
-
-                    //Need to bring in the Humanoid Instance too to filter for players versus creatures.
-                    yield return LogMessage(new CodeInstruction(OpCodes.Ldarg_0));
-                    counter++;
-          
-                    //Patch Calling Method
-                    yield return LogMessage(new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(EquipmentEffectCache), nameof(EquipmentEffectCache.AddActiveBackpackEffects))));
-                    counter++;
-
-                    //Save output of calling method to local variable 0
-                    yield return LogMessage(new CodeInstruction(OpCodes.Stloc_0));
-                    counter++;
-                    
-                    patchedSuccess = true;
-                }
-            }
-
-            if (!patchedSuccess)
-            {
-                AdventureBackpacks.Log.Error($"{nameof(Humanoid.UpdateEquipmentStatusEffects)} Transpiler Failed To Patch");
-                Thread.Sleep(5000);
-            }
+            return matcher.Advance(2).Insert(
+                    new CodeInstruction(OpCodes.Ldloc_0),                        // HashSet<StatusEffect> other
+                    new CodeInstruction(OpCodes.Ldarg_0),                        // Humanoid this, to filter players from creatures
+                    new CodeInstruction(OpCodes.Call, AccessTools.DeclaredMethod(typeof(EquipmentEffectCache), nameof(EquipmentEffectCache.AddActiveBackpackEffects))),
+                    new CodeInstruction(OpCodes.Stloc_0))
+                .Instructions();
         }
     }
     
@@ -95,7 +60,7 @@ public class HumanoidPatches
             var item = __0;
 
             // Check if the item being unequipped is a backpack, and see if it is the same backpack the player is wearing
-            if (item.IsBackpack() && player.m_shoulderItem == item)
+            if (player.IsThisBackpackEquipped(item))
             {
                 var backpackInventory = player.GetEquippedBackpack();
                 if (backpackInventory is null) return;
