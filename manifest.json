@@ -2,7 +2,7 @@
   "name": "AdventureBackpacks",
   "version_number": "1.9.13",
   "website_url": "https://github.com/Vapok/AdventureBackpacks",
-  "description": "Adventure Backpacks by Vapok. Personal fork for Valheim 1.0.7 by Morgott, plugin version 1.9.13.2, HD assets by psionprime. Not published to Thunderstore.",
+  "description": "Adventure Backpacks by Vapok. Personal fork for Valheim 1.0.7 by Morgott, plugin version 1.9.13.4, HD assets by psionprime. Not published to Thunderstore.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2333",
     "ValheimModding-Jotunn-2.26.1",

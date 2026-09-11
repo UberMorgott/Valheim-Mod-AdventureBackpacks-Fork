@@ -1,3 +1,9 @@
+# 1.9.13.4 - Morgott's fork: EQS slot and Auga fixes
+* With EquipmentAndQuickSlots, an equipped backpack moves into the Backpack slot and stays out of the Shoulder slot.
+* EQS API is bound from the live EQS plugin assembly.
+* ApiManager keeps owners of in-module method definitions.
+* Durability bar width override is skipped under Auga/AugaSkin.
+
 # 1.9.13.2 - Morgott's fork: patch robustness and EquipmentAndQuickSlots
 Personal fork for Valheim 1.0.7 maintained by Morgott (UberMorgott). Original mod by Vapok, HD assets by psionprime.
 * Harmony patches are applied class by class inside a try/catch. A single stale target now logs its class name and is

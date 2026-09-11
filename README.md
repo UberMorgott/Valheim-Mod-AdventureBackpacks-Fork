@@ -1,7 +1,7 @@
 # Adventure Backpacks — Morgott's personal fork
 
 **Personal fork for Valheim 1.0.7**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
-Plugin version **1.9.13.2**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+Plugin version **1.9.13.4**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
 equipped backpacks keep working.
 
 Credit where it is due:
@@ -14,7 +14,7 @@ Licensed under the MIT licence of the upstream project. `LICENSE.md` carries Vap
 preserved unchanged, as the licence requires.
 
 This fork is not published to Thunderstore. `manifest.json` still reports the upstream package version `1.9.13`
-because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.2`.
+because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.4`.
 
 ---
 
