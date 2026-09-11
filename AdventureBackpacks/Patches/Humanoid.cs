@@ -90,7 +90,7 @@ public class HumanoidPatches
     [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.EquipItem))]
     static class HumanoidEquipItemPatch
     {
-        static void Postfix(ItemDrop.ItemData __0, bool __result)
+        static void Postfix(Humanoid __instance, ItemDrop.ItemData __0, bool __result)
         {
             AdventureBackpacks.Log.Debug($"##########   EquipItem Start");
             if (__0 is null) return;
@@ -110,7 +110,9 @@ public class HumanoidPatches
             if (item.IsBackpack() && item.TryGetBackpackItem(out var backpack))
             {
                 InventoryGuiPatches.BackpackEquipped = true;
-                
+                if (__instance == player)
+                    Compats.EquipmentAndQuickSlotsCompat.MoveToBackpackSlot(player, item);
+
                 var backpackItem = item.Data().GetOrCreate<BackpackComponent>();
                 
                 if (!backpackItem.IsEmptyingBackpack)

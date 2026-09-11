@@ -81,6 +81,7 @@ public static class EquipmentAndQuickSlotsCompat
             // equipment slot. Backpacks are Shoulder items, so without this they always ended up in Shoulder and the
             // Backpack slot stayed empty. The Shoulder slot now refuses backpacks while the Backpack slot is registered.
             var slotType = apiType.Assembly.GetType("EquipmentAndQuickSlots.Slots+Slot");
+            _getSlotInfo = AccessTools.DeclaredMethod(apiType, "GetSlotInfoJson");
             _findSlot = AccessTools.DeclaredMethod(apiType.Assembly.GetType("EquipmentAndQuickSlots.Slots"), "FindSlot");
             var itemFits = slotType == null ? null : AccessTools.DeclaredMethod(slotType, "ItemFits");
             if (itemFits == null || _findSlot == null)
@@ -142,7 +143,41 @@ public static class EquipmentAndQuickSlotsCompat
         }
     }
 
-    private static System.Reflection.MethodInfo _findSlot;
+    private static System.Reflection.MethodInfo _findSlot, _getSlotInfo;
+    private static Vector2i? _slotCell;
+
+    /// <summary>
+    /// EQS moves equipped items only into its built-in equipment slots (SlotValidation), never into custom ones,
+    /// so an equipped backpack stays in the main grid. Put it into the free Backpack slot cell the way EQS moves
+    /// items itself (item.m_gridPos = slot.GridPosition, then Inventory.Changed). Cell from API.GetSlotInfoJson.
+    /// </summary>
+    public static void MoveToBackpackSlot(Player player, ItemDrop.ItemData item)
+    {
+        if (!_slotRegistered || _getSlotInfo == null || !IsBackpackItem(item))
+            return;
+        try
+        {
+            if (_slotCell == null)
+            {
+                var json = (string)_getSlotInfo.Invoke(null, new object[] { SlotId });
+                var x = System.Text.RegularExpressions.Regex.Match(json ?? "", "\"gridX\":(\\d+)");
+                var y = System.Text.RegularExpressions.Regex.Match(json ?? "", "\"gridY\":(\\d+)");
+                if (!x.Success || !y.Success)
+                    return;
+                _slotCell = new Vector2i(int.Parse(x.Groups[1].Value), int.Parse(y.Groups[1].Value));
+            }
+            var cell = _slotCell.Value;
+            var inventory = player.GetInventory();
+            if (item.m_gridPos == cell || inventory.GetItemAt(cell.x, cell.y) != null)
+                return;
+            item.m_gridPos = cell;
+            inventory.Changed();
+        }
+        catch (Exception e)
+        {
+            AdventureBackpacks.Log.Error($"Moving the backpack into the EquipmentAndQuickSlots slot failed: {e.Message}");
+        }
+    }
     private static object _shoulderSlot;
     private static bool _slotRegistered;
 
