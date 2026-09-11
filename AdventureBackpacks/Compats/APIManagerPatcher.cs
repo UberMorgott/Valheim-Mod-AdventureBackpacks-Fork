@@ -547,7 +547,9 @@ internal static class Patcher
 				{
 					((IDisposable)enumerator2/*cast due to constrained. prefix*/).Dispose();
 				}
-				if (!(method is MethodSpecification))
+				// Like VisitField: never re-own a definition of this module, or Cecil's Write throws
+				// InvalidCastException in AddOverrides (same fix as Auga 76853a8).
+				if (!(method is MethodSpecification) && !(method is MethodDefinition))
 				{
 					((MemberReference)method).DeclaringType = VisitType(((MemberReference)method).DeclaringType, referencingEntityName);
 				}

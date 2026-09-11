@@ -104,7 +104,7 @@ public static class EquipmentAndQuickSlotsCompat
         catch (Exception e)
         {
             _registrationAttempted = false;
-            AdventureBackpacks.Log.Error($"Failed to register the '{SlotId}' slot with EquipmentAndQuickSlots: {e.Message}");
+            AdventureBackpacks.Log.Error($"Failed to register the '{SlotId}' slot with EquipmentAndQuickSlots: {e}");
         }
     }
 
