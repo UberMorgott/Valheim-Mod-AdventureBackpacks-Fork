@@ -1,7 +1,7 @@
 # Adventure Backpacks — Morgott's personal fork
 
-**Personal fork for Valheim 1.0.7**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
-Plugin version **1.9.13.5**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+Fork of [AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) by **Vapok**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
+Plugin version **1.9.14.1**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
 equipped backpacks keep working.
 
 Credit where it is due:
