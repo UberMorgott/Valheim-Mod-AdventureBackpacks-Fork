@@ -1,3 +1,9 @@
+# 1.9.14.1 - Morgott's fork: hotkeys work on any keyboard layout
+* Open backpack, quickdrop and the Wisplight toggle are bound to the physical key instead of the layout-dependent
+  one, so they fire on a Russian (or any non-QWERTY) layout. The three hotkey settings are now plain keys
+  (`KeyCode`) instead of key combinations; modifier combos are no longer supported. A stale `I + LeftControl`
+  style value in an existing config file fails to parse and falls back to the default.
+
 # 1.9.14.0 - Morgott's fork: Jotunn does the registering
 * Backpacks are registered as Jotunn custom items, with one recipe per crafting station created from the config
   values. Prefabs, recipes and the fixed status effects (cold immunity, frost resistance, wet resistance) are added

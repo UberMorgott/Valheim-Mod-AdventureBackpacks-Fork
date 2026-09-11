@@ -11,15 +11,15 @@ namespace AdventureBackpacks.Configuration
     public class ConfigRegistry : ConfigSyncBase
     {
         //Configuration Entry Privates
-        internal static ConfigEntry<KeyboardShortcut> HotKeyOpen;
-        internal static ConfigEntry<KeyboardShortcut> HotKeyDrop;
+        internal static ConfigEntry<KeyCode> HotKeyOpen;
+        internal static ConfigEntry<KeyCode> HotKeyDrop;
         internal static ConfigEntry<bool> OpenWithInventory;
         internal static ConfigEntry<bool> OpenWithHoverInteract;
         internal static ConfigEntry<bool> CloseInventory;
         internal static ConfigEntry<bool> OutwardMode;
         internal static ConfigEntry<bool> ReplaceShader;
 
-        //Buttons registered with Jotunn: polled by name, modifiers included, rebindable through the config entry.
+        //Buttons registered with Jotunn: polled by name, rebindable through the config entry.
         internal static ButtonConfig OpenBackpackButton;
         internal static ButtonConfig DropBackpackButton;
         private static string _modGuid;
@@ -38,10 +38,12 @@ namespace AdventureBackpacks.Configuration
             DropBackpackButton = AddButton("AdventureBackpacks_QuickdropBackpack", HotKeyDrop);
         }
 
-        internal static ButtonConfig AddButton(string name, ConfigEntry<KeyboardShortcut> shortcut)
+        internal static ButtonConfig AddButton(string name, ConfigEntry<KeyCode> key)
         {
             //AddButton appends the mod GUID to the name, so poll by ButtonConfig.Name.
-            var button = new ButtonConfig { Name = name, ShortcutConfig = shortcut };
+            //Config (KeyCode), not ShortcutConfig: Jotunn binds it through ZInput.KeyCodeToPath, which is the
+            //physical key. ShortcutConfig additionally gates on UnityEngine.Input, which follows the keyboard layout.
+            var button = new ButtonConfig { Name = name, Config = key };
             InputManager.Instance.AddButton(_modGuid, button);
             return button;
         }
@@ -52,10 +54,10 @@ namespace AdventureBackpacks.Configuration
                 return;
             
             //User Configs
-            UnsyncedConfig("Local Config", "Open Backpack", new KeyboardShortcut(KeyCode.I),
+            UnsyncedConfig("Local Config", "Open Backpack", KeyCode.I,
                 new ConfigDescription("Hotkey to open backpack.", null, new ConfigurationManagerAttributes{ Order = 3 }), ref HotKeyOpen);
             
-            UnsyncedConfig("Local Config", "Quickdrop Backpack", new KeyboardShortcut(KeyCode.Y),
+            UnsyncedConfig("Local Config", "Quickdrop Backpack", KeyCode.Y,
                 new ConfigDescription("Hotkey to quickly drop backpack while on the run.",
                     null,
                     new ConfigurationManagerAttributes { Order = 1 }),ref HotKeyDrop);

@@ -10,7 +10,7 @@ namespace AdventureBackpacks.Assets.Effects;
 public class Demister: EffectsBase
 {
     private static Heightmap.Biome _previouseBiome = Heightmap.Biome.None;
-    private static ConfigEntry<KeyboardShortcut> WisplightKeyToggle;
+    private static ConfigEntry<KeyCode> WisplightKeyToggle;
     private static ConfigEntry<bool> WisplightBiomeLogic;
     private static ButtonConfig _wisplightButton;
 
@@ -85,7 +85,7 @@ public class Demister: EffectsBase
     {
         base.RegisterEffectConfiguration();
         
-        ConfigSyncBase.UnsyncedConfig("Wisplight Client Settings", "Wisplight Effect Key Toggle", new KeyboardShortcut(KeyCode.L),
+        ConfigSyncBase.UnsyncedConfig("Wisplight Client Settings", "Wisplight Effect Key Toggle", KeyCode.L,
             new ConfigDescription("Hotkey to turn Wisplight on and off",
                 null,
                 new ConfigurationManagerAttributes { Order = 1 }),ref WisplightKeyToggle);
@@ -94,7 +94,7 @@ public class Demister: EffectsBase
             new ConfigDescription("If enabled, the Wisplight will automatically turn on when entering Mistlands, and turn off when exiting.",
                 null, new ConfigurationManagerAttributes { Order = 2 }), ref WisplightBiomeLogic);
 
-        //Registered button: the configured modifiers count, which plain key polling ignored.
+        //Registered button: bound by physical key, so it works on any keyboard layout.
         _wisplightButton = ConfigRegistry.AddButton("AdventureBackpacks_WisplightToggle", WisplightKeyToggle);
     }
 }
