@@ -48,7 +48,6 @@ namespace AdventureBackpacks
         
         //Class Properties
         public static ILogIt Log => _log;
-        public static bool ValheimAwake;
         public static bool PerformYardSale = false;
         public static bool QuickDropping = false;
         public static bool BypassMoveProtection = false;
@@ -74,8 +73,10 @@ namespace AdventureBackpacks
             //Waiting For Startup
             Waiter = new Waiting();
             
-            //Jotunn Localization
+            //Jotunn Localization: English is embedded; other languages are side-loaded by Jotunn
+            //from Translations/<Language>/AdventureBackpacks.json next to the plugin.
             var localization = LocalizationManager.Instance.GetLocalization();
+            localization.AddJsonFile("English", AssetUtils.LoadTextFromResources("Translations.English.json", typeof(AdventureBackpacks).Assembly));
 
             //Register Logger
             LogManager.Init(PluginId,out _log);
@@ -101,6 +102,11 @@ namespace AdventureBackpacks
                 }
             }
 
+            //Backpacks need vanilla prefabs (recipe items, crafting stations) and loaded translations.
+            PrefabManager.OnVanillaPrefabsAvailable += InitializeBackpacks;
+            //Every menu ObjectDB with our items in it: effects resolve their vanilla status effects.
+            Jotunn.Managers.ItemManager.OnItemsRegisteredFejd += () => Waiter.ValheimIsAwake(true);
+
             //Compatibilities
             if (Chainloader.PluginInfos.ContainsKey("com.chebgonaz.ChebsNecromancy"))
             {
@@ -123,8 +129,6 @@ namespace AdventureBackpacks
 
         private void Start()
         {
-            Localizer.Waiter.StatusChanged += InitializeBackpacks;
-            
             //Initialized Features
             QuickTransfer.FeatureInitialized = true;
         }
@@ -152,11 +156,11 @@ namespace AdventureBackpacks
             InventoryPatches.ProcessItemsAddedQueue();
         }
 
-        public void InitializeBackpacks(object send, EventArgs args)
+        private void InitializeBackpacks()
         {
-            if (ValheimAwake)
-                return;
-            
+            //Once: the event fires on every menu start.
+            PrefabManager.OnVanillaPrefabsAvailable -= InitializeBackpacks;
+
             //Register Effects
             var effectsFactory = new EffectsFactory(_log, _config);
             effectsFactory.RegisterEffects();
@@ -175,8 +179,6 @@ namespace AdventureBackpacks
 
             //Recipe/drop configs and the Jotunn recipes of every backpack
             global::ItemManager.Item.RegisterAll();
-
-            ValheimAwake = true;
         }
         
         private void OnDestroy()
