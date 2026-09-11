@@ -1,6 +1,6 @@
 ﻿using AdventureBackpacks.Extensions;
-using Vapok.Common.Managers.StatusEffects;
-using Vapok.Common.Shared;
+using Jotunn.Entities;
+using UnityEngine;
 
 namespace AdventureBackpacks.Assets.Effects;
 
@@ -16,10 +16,13 @@ public class FrostResistance : EffectsBase
         if (_externalStatusEffect == null)
         {
             var freezing = ObjectDB.instance.GetStatusEffect("Freezing".GetHashCode());
-            var se = new CustomSE(Enums.StatusEffects.Stats, "SE_vapok_ab_frost_resistance");
-            se.Effect.m_name = "$vapok_mod_se_frost_resistance";
-            se.Effect.m_icon = freezing.m_icon;
-            _externalStatusEffect = se.Effect;
+            var se = ScriptableObject.CreateInstance<SE_Stats>();
+            se.name = "SE_vapok_ab_frost_resistance";
+            se.m_name = "$vapok_mod_se_frost_resistance";
+            se.m_icon = freezing.m_icon;
+            _externalStatusEffect = se;
+            // Fixed template: Jotunn adds it to every ObjectDB. Per-backpack effects are built at runtime instead.
+            Jotunn.Managers.ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(se, fixReference: false));
             SetStatusEffect(_externalStatusEffect);
         }
     }
