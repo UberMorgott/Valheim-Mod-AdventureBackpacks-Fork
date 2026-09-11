@@ -82,7 +82,7 @@ namespace AdventureBackpacks
             LogManager.Init(PluginId,out _log);
             
             //Initialize Managers (no location manager: AB registers no locations)
-            Initializer.LoadManagers(localization, enableItemManager: true, enableMaterialReplacer: true, enableEffectManager: true);
+            Initializer.LoadManagers(localization, enableMaterialReplacer: true, enableEffectManager: true);
 
             //Register Configuration Settings
             _config = new ConfigRegistry(_instance);
