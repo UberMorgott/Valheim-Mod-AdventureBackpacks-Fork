@@ -148,9 +148,9 @@ internal static class InventoryGuiPatches
 
     public static bool DetectInputToHide(Player player, InventoryGui instance)
     {
-        var hotKeyDown = ZInput.GetKeyDown(ConfigRegistry.HotKeyOpen.Value.MainKey);
+        var hotKeyDown = ZInput.GetButtonDown(ConfigRegistry.OpenBackpackButton.Name);
         var hotKeyDownOnClose = ConfigRegistry.CloseInventory.Value && hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value;
-        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetKeyDown(ConfigRegistry.HotKeyDrop.Value.MainKey);
+        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetButtonDown(ConfigRegistry.DropBackpackButton.Name);
 
         var openBackpack = hotKeyDown && !BackpackIsOpen && player.CanOpenBackpack() && !ConfigRegistry.OpenWithHoverInteract.Value;
         
@@ -253,8 +253,8 @@ internal static class InventoryGuiPatches
     
     public static bool DetectInputToShow(Player player, InventoryGui instance)
     {
-        var hotKeyDown = ZInput.GetKeyDown(ConfigRegistry.HotKeyOpen.Value.MainKey);
-        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetKeyDown(ConfigRegistry.HotKeyDrop.Value.MainKey);
+        var hotKeyDown = ZInput.GetButtonDown(ConfigRegistry.OpenBackpackButton.Name);
+        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetButtonDown(ConfigRegistry.DropBackpackButton.Name);
 
         if (hotKeyDrop && !CheckForTextInput())
         {

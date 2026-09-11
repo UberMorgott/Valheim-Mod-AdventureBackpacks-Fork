@@ -1,5 +1,7 @@
 ﻿using System;
 using BepInEx.Configuration;
+using Jotunn.Configs;
+using Jotunn.Managers;
 using UnityEngine;
 using Vapok.Common.Abstractions;
 using Vapok.Common.Managers.Configuration;
@@ -16,7 +18,12 @@ namespace AdventureBackpacks.Configuration
         internal static ConfigEntry<bool> CloseInventory;
         internal static ConfigEntry<bool> OutwardMode;
         internal static ConfigEntry<bool> ReplaceShader;
-        
+
+        //Buttons registered with Jotunn: polled by name, modifiers included, rebindable through the config entry.
+        internal static ButtonConfig OpenBackpackButton;
+        internal static ButtonConfig DropBackpackButton;
+        private static string _modGuid;
+
         public static Waiting Waiter;
 
         public ConfigRegistry(IPluginInfo mod): base(mod)
@@ -25,6 +32,18 @@ namespace AdventureBackpacks.Configuration
             Waiter = new Waiting();
 
             InitializeConfigurationSettings();
+
+            _modGuid = mod.PluginId;
+            OpenBackpackButton = AddButton("AdventureBackpacks_OpenBackpack", HotKeyOpen);
+            DropBackpackButton = AddButton("AdventureBackpacks_QuickdropBackpack", HotKeyDrop);
+        }
+
+        internal static ButtonConfig AddButton(string name, ConfigEntry<KeyboardShortcut> shortcut)
+        {
+            //AddButton appends the mod GUID to the name, so poll by ButtonConfig.Name.
+            var button = new ButtonConfig { Name = name, ShortcutConfig = shortcut };
+            InputManager.Instance.AddButton(_modGuid, button);
+            return button;
         }
 
         public sealed override void InitializeConfigurationSettings()

@@ -1,5 +1,7 @@
-﻿using AdventureBackpacks.Extensions;
+﻿using AdventureBackpacks.Configuration;
+using AdventureBackpacks.Extensions;
 using BepInEx.Configuration;
+using Jotunn.Configs;
 using UnityEngine;
 using Vapok.Common.Managers.Configuration;
 
@@ -10,6 +12,7 @@ public class Demister: EffectsBase
     private static Heightmap.Biome _previouseBiome = Heightmap.Biome.None;
     private static ConfigEntry<KeyboardShortcut> WisplightKeyToggle;
     private static ConfigEntry<bool> WisplightBiomeLogic;
+    private static ButtonConfig _wisplightButton;
 
     
     public Demister(string effectName, string effectDesc) : base(effectName, effectDesc)
@@ -33,7 +36,7 @@ public class Demister: EffectsBase
                     SetEffectSwitch(true);
                     player.UpdateEquipmentStatusEffects();
                 }
-                if (ZInput.GetKeyDown(WisplightKeyToggle.Value.MainKey))
+                if (ZInput.GetButtonDown(_wisplightButton.Name))
                 {
                     if (IsEffectActive(Player.m_localPlayer))
                     {
@@ -91,5 +94,7 @@ public class Demister: EffectsBase
             new ConfigDescription("If enabled, the Wisplight will automatically turn on when entering Mistlands, and turn off when exiting.",
                 null, new ConfigurationManagerAttributes { Order = 2 }), ref WisplightBiomeLogic);
 
+        //Registered button: the configured modifiers count, which plain key polling ignored.
+        _wisplightButton = ConfigRegistry.AddButton("AdventureBackpacks_WisplightToggle", WisplightKeyToggle);
     }
 }
