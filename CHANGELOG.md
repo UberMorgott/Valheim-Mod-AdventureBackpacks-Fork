@@ -1,3 +1,6 @@
+# 1.9.13.5 - Morgott's fork: backpack uses the EQS Shoulder slot
+* The dedicated EquipmentAndQuickSlots "Backpack" slot is removed; a backpack now uses the EQS Shoulder slot like a cape (either one on your back).
+
 # 1.9.13.4 - Morgott's fork: EQS slot and Auga fixes
 * With EquipmentAndQuickSlots, an equipped backpack moves into the Backpack slot and stays out of the Shoulder slot.
 * EQS API is bound from the live EQS plugin assembly.

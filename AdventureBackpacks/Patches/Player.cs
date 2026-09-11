@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
-using AdventureBackpacks.Compats;
 using HarmonyLib;
 
 namespace AdventureBackpacks.Patches;
@@ -14,10 +13,6 @@ public class PlayerPatches
         static void Postfix(Player __instance)
         {
             __instance.gameObject.AddComponent<Container>();
-
-            // First Player.Awake is the earliest point where EquipmentAndQuickSlots' Slots exist.
-            // The call is a no-op after the first successful registration.
-            EquipmentAndQuickSlotsCompat.RegisterSlot();
         }
     }
 

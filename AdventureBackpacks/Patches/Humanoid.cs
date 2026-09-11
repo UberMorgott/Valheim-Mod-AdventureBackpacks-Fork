@@ -110,8 +110,6 @@ public class HumanoidPatches
             if (item.IsBackpack() && item.TryGetBackpackItem(out var backpack))
             {
                 InventoryGuiPatches.BackpackEquipped = true;
-                if (__instance == player)
-                    Compats.EquipmentAndQuickSlotsCompat.MoveToBackpackSlot(player, item);
 
                 var backpackItem = item.Data().GetOrCreate<BackpackComponent>();
                 

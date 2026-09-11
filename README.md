@@ -1,20 +1,20 @@
 # Adventure Backpacks — Morgott's personal fork
 
 **Personal fork for Valheim 1.0.7**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
-Plugin version **1.9.13.4**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+Plugin version **1.9.13.5**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
 equipped backpacks keep working.
 
 Credit where it is due:
 
 - **Original mod and all gameplay design:** **Vapok** (Pete Navarra) — [github.com/Vapok/AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) · [Vapok's Mods Discord](https://discord.gg/5YAJkRFBXt)
 - **HD backpack assets:** **psionprime**, from [AdventureBackpacksHD](https://github.com/psionprime/AdventureBackpacksHD)
-- **This fork:** Valheim 1.0.7 compatibility, patch robustness, and EquipmentAndQuickSlots integration
+- **This fork:** Valheim 1.0.7 compatibility, patch robustness, and EquipmentAndQuickSlots compatibility
 
 Licensed under the MIT licence of the upstream project. `LICENSE.md` carries Vapok's copyright notice and is
 preserved unchanged, as the licence requires.
 
 This fork is not published to Thunderstore. `manifest.json` still reports the upstream package version `1.9.13`
-because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.4`.
+because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.5`.
 
 ---
 
@@ -27,7 +27,7 @@ because Thunderstore only accepts three-part versions; the runtime plugin versio
 | **Foreign exceptions** | The finalizer on `InventoryGui.OnSelectedItem` only swallows its own backpack NRE. Any other mod's exception is logged and rethrown untouched. |
 | **Patch hygiene** | `EnvMan.IsCold`, `EnvMan.IsWet`, `ItemDrop.ItemData.GetIcon` and `ItemDrop.ItemData.GetWeight` are postfixes rather than skipping prefixes or transpilers. The remaining transpilers are anchored with `CodeMatcher` on real method calls and log an explicit error when the anchor is gone. |
 | **Cheaper hot path** | The `SEMan.RemoveStatusEffect` prefix returns early for anything that is not the local player's `SEMan`. |
-| **EquipmentAndQuickSlots** | Optional integration: with EQS installed, backpacks get their own `Backpack` equipment slot instead of competing with capes. Detected by reflection, no assembly reference, and the vanilla `ItemType.Shoulder` path still works without EQS. |
+| **EquipmentAndQuickSlots** | No dedicated slot: a backpack is a vanilla `ItemType.Shoulder` item, so with EQS installed it goes into the EQS `Shoulder` slot (cape or backpack on your back). |
 
 ---
 
