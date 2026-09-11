@@ -1,6 +1,8 @@
 ﻿using System;
 using AdventureBackpacks.Configuration;
+using AdventureBackpacks.Features;
 using ItemManager;
+using Jotunn.Entities;
 using UnityEngine;
 using Vapok.Common.Managers.PieceManager;
 using CraftingTable = ItemManager.CraftingTable;
@@ -16,7 +18,6 @@ internal interface IAssetItem
 internal abstract class AssetItem : IAssetItem
 {
     
-    private readonly string _assetFolderName = "Assets.Bundles";
     private readonly Item _item;
 
     public string AssetName { get; }
@@ -25,6 +26,8 @@ internal abstract class AssetItem : IAssetItem
     public string ItemName { get; }
 
     public Item Item => _item;
+
+    public CustomItem CustomItem { get; }
 
     internal AssetItem(GameObject goItem, string itemName)
     {
@@ -35,41 +38,25 @@ internal abstract class AssetItem : IAssetItem
         {
             Configurable = Configurability.Disabled
         };
-        
-        SetupItem();
+
+        SetPersistence();
+        ResetPrefabArmor();
+
+        // Jotunn owns the prefab: ZNetScene on every ZNetScene.Awake, ObjectDB on every menu/world ObjectDB.
+        // The recipe is created later from the config values (Item.RegisterAll).
+        CustomItem = new CustomItem(goItem, fixReference: false);
+        Jotunn.Managers.ItemManager.Instance.AddItem(CustomItem);
     }
 
     internal AssetItem(AssetBundle bundle, string prefabName, string itemName)
+        : this(bundle.LoadAsset<GameObject>(prefabName), itemName)
     {
-        PrefabName = prefabName;
-        ItemName = itemName;
-        
-        _item = new Item(bundle,prefabName)
-        {
-            Configurable = Configurability.Disabled
-        };
-        
-        SetupItem();
     }
 
     internal AssetItem(string assetName, string prefabName, string itemName)
+        : this(Utilities.LoadAssetBundle(assetName), prefabName, itemName)
     {
         AssetName = assetName;
-        PrefabName = prefabName;
-        ItemName = itemName;
-
-        _item = new Item(AssetName, PrefabName, _assetFolderName)
-        {
-            Configurable = Configurability.Disabled
-        };
-        
-        SetupItem();
-    }
-
-    private void SetupItem()
-    {
-        SetPersistence();
-        ResetPrefabArmor();
     }
 
     internal void AssignCraftingTable(CraftingTable craftingTable, int stationLevel)

@@ -42,7 +42,8 @@ public static class Utilities
 
         foreach (var bundle in AssetBundle.GetAllLoadedAssetBundles())
         {
-            if (bundle == null)
+            // LoadAsset throws on streamed scene bundles (other mods' location/scene bundles).
+            if (bundle == null || bundle.isStreamedSceneAssetBundle)
                 continue;
 
             if (ContainsAsset<GameObject>(bundle, probeAsset))

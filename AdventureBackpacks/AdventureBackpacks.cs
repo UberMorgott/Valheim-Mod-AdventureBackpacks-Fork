@@ -23,7 +23,6 @@ using Vapok.Common.Managers.Configuration;
 using Vapok.Common.Managers.LocalizationManager;
 using Vapok.Common.Tools;
 using BoneReorder = Vapok.Common.Tools.BoneReorder;
-using PrefabManager = ItemManager.PrefabManager;
 
 namespace AdventureBackpacks
 {
@@ -87,8 +86,6 @@ namespace AdventureBackpacks
             //Register Configuration Settings
             _config = new ConfigRegistry(_instance);
 
-            PrefabManager.Initalized = true;
-           
             //Patch Harmony one class at a time: a single stale target must not abort Awake and
             //silently disable every other patch in the mod.
             _harmony = new Harmony(Info.Metadata.GUID);
@@ -175,6 +172,9 @@ namespace AdventureBackpacks
             BoneReorder.ApplyOnEquipmentChanged(Info.Metadata.GUID);
             
             ConfigRegistry.Waiter.ConfigurationComplete(true);
+
+            //Recipe/drop configs and the Jotunn recipes of every backpack
+            global::ItemManager.Item.RegisterAll();
 
             ValheimAwake = true;
         }
