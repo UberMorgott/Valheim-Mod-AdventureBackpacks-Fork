@@ -76,6 +76,19 @@ public static class EquipmentAndQuickSlotsCompat
                 Delegate.CreateDelegate(typeof(Func<string, string, string, Func<ItemDrop.ItemData, bool>, Func<bool>, bool>), addSlot);
             _tryGetSlotItem = (TryGetSlotItemDelegate)Delegate.CreateDelegate(typeof(TryGetSlotItemDelegate), tryGetSlotItem);
 
+            // EQS's built-in Shoulder slot accepts every ItemType.Shoulder item (Slots.EquipmentSlotValidator), and
+            // SlotValidation moves any equipped equipment-slot item out of a custom slot into the first free
+            // equipment slot. Backpacks are Shoulder items, so without this they always ended up in Shoulder and the
+            // Backpack slot stayed empty. The Shoulder slot now refuses backpacks while the Backpack slot is registered.
+            var slotType = apiType.Assembly.GetType("EquipmentAndQuickSlots.Slots+Slot");
+            _findSlot = AccessTools.DeclaredMethod(apiType.Assembly.GetType("EquipmentAndQuickSlots.Slots"), "FindSlot");
+            var itemFits = slotType == null ? null : AccessTools.DeclaredMethod(slotType, "ItemFits");
+            if (itemFits == null || _findSlot == null)
+                AdventureBackpacks.Log.Warning("EquipmentAndQuickSlots Slot.ItemFits or Slots.FindSlot not found; backpacks may land in the Shoulder slot.");
+            else
+                new Harmony("vapok.mods.adventurebackpacks.eqs").Patch(itemFits,
+                    postfix: new HarmonyMethod(typeof(EquipmentAndQuickSlotsCompat), nameof(ShoulderRefusesBackpack)));
+
             AdventureBackpacks.Log.Message($"EquipmentAndQuickSlots detected (API version {apiVersion}). A dedicated backpack slot will be registered.");
         }
         catch (Exception e)
@@ -100,6 +113,7 @@ public static class EquipmentAndQuickSlotsCompat
         {
             // AddSlot returning false means the slot is already registered, which is not an error.
             var added = _addSlot(SlotId, "vapok.mods.adventurebackpacks", SlotNameToken, IsBackpackItem, () => true);
+            _slotRegistered = true;
             AdventureBackpacks.Log.Message(added
                 ? $"Registered the '{SlotId}' equipment slot with EquipmentAndQuickSlots."
                 : $"The '{SlotId}' equipment slot was already registered with EquipmentAndQuickSlots.");
@@ -126,6 +140,20 @@ public static class EquipmentAndQuickSlotsCompat
             AdventureBackpacks.Log.Error($"EquipmentAndQuickSlots TryGetSlotItem failed: {e.Message}");
             return null;
         }
+    }
+
+    private static System.Reflection.MethodInfo _findSlot;
+    private static object _shoulderSlot;
+    private static bool _slotRegistered;
+
+    // Postfix on EQS Slots.Slot.ItemFits(ItemData). The Shoulder slot object is looked up once (Slots.FindSlot).
+    private static void ShoulderRefusesBackpack(object __instance, ItemDrop.ItemData item, ref bool __result)
+    {
+        if (!__result || !_slotRegistered || !IsBackpackItem(item))
+            return;
+        _shoulderSlot ??= _findSlot.Invoke(null, new object[] { "Shoulder" });
+        if (ReferenceEquals(__instance, _shoulderSlot))
+            __result = false;
     }
 
     // Must go through IsBackpack(), an m_itemType check would let every cape into the slot.
