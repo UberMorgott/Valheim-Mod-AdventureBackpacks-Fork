@@ -39,12 +39,15 @@ public static class EquipmentAndQuickSlotsCompat
 
         _initialized = true;
 
-        if (!Chainloader.PluginInfos.ContainsKey(PluginGuid))
+        if (!Chainloader.PluginInfos.TryGetValue(PluginGuid, out var eqsInfo) || eqsInfo.Instance == null)
             return;
 
         try
         {
-            var apiType = AccessTools.TypeByName("EquipmentAndQuickSlots.API");
+            // Resolve from the live plugin's own assembly, never AccessTools.TypeByName: EQS can be in the
+            // AppDomain twice (APIManager byte-reload), and the stray copy's Slots.slots is never initialized,
+            // so AddSlot NREs in TryAddCustomSlotAt.
+            var apiType = eqsInfo.Instance.GetType().Assembly.GetType("EquipmentAndQuickSlots.API");
             if (apiType == null)
             {
                 AdventureBackpacks.Log.Warning($"{PluginGuid} is loaded but its API type was not found. Falling back to the vanilla shoulder slot.");
