@@ -1,3 +1,18 @@
+# 1.9.14.0 - Morgott's fork: Jotunn does the registering
+* Backpacks are registered as Jotunn custom items, with one recipe per crafting station created from the config
+  values. Prefabs, recipes and the fixed status effects (cold immunity, frost resistance, wet resistance) are added
+  to ObjectDB and ZNetScene by Jotunn instead of the bundled helper's own hooks. Prefab names, recipe names, costs,
+  station levels, drops and config keys are unchanged.
+* **Translations moved**: other languages now live in `Translations/<Language>/AdventureBackpacks.json` next to the
+  plugin (Jotunn side-loading) instead of `Translations/AdventureBackpacks.<Language>.json`. English ships inside
+  the DLL. Delete the old flat files when updating.
+* Hotkeys (open backpack, quickdrop, Wisplight toggle) are registered buttons: configured modifiers now count. The
+  Wisplight toggle previously fired on its main key with any modifier held.
+* Startup hangs on Jotunn's events instead of patching FejdStartup, and asset bundles are loaded once through
+  Jotunn's AssetUtils rather than by scanning every bundle in the game.
+* Builds against JotunnLib 2.30.0. Dropped from the bundled helper: creature, location, skill and piece-building
+  managers, trader and smelter-conversion support - none of them were used.
+
 # 1.9.13.5 - Morgott's fork: backpack uses the EQS Shoulder slot
 * The dedicated EquipmentAndQuickSlots "Backpack" slot is removed; a backpack now uses the EQS Shoulder slot like a cape (either one on your back).
 
