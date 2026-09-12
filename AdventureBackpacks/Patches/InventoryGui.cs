@@ -187,8 +187,23 @@ internal static class InventoryGuiPatches
             }
         }
 
+        // Hotkey while the extra backpack panel is up closes only that panel, the chest stays open.
+        if (hotKeyDown && BackpackPanel.IsOpen && !CheckForTextInput())
+        {
+            BackpackPanel.Close(instance);
+            return false;
+        }
+
         if (openBackpack & !CheckForTextInput())
         {
+            // A real container is open (not the player's own backpack container): show the backpack as a
+            // third panel next to it instead of replacing it.
+            if (instance.m_currentContainer != null && !instance.m_currentContainer.name.Equals("Player(Clone)"))
+            {
+                BackpackPanel.Open(player, instance);
+                return false;
+            }
+
             if (instance.m_currentContainer != null)
             {
                 instance.m_currentContainer.SetInUse(false);
