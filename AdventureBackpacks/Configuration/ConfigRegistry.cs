@@ -62,7 +62,7 @@ namespace AdventureBackpacks.Configuration
                     null,
                     new ConfigurationManagerAttributes { Order = 1 }),ref HotKeyDrop);
            
-            UnsyncedConfig("Local Config", "Open with Inventory", false,
+            UnsyncedConfig("Local Config", "Open with Inventory", true,
                 new ConfigDescription("If enabled, both backpack and inventory will open when Inventory is opened.",
                     null, new ConfigurationManagerAttributes { Order = 3 }),ref OpenWithInventory);
             
