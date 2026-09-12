@@ -1,3 +1,14 @@
+# 1.9.14.2 - Morgott's fork: backpack as a third inventory panel
+* The backpack now opens together with the player inventory by default (`Open with Inventory` defaults to true).
+* Pressing the backpack hotkey while a chest is open no longer replaces the chest. The backpack shows up as a third
+  panel in the crafting panel's place (crafting is hidden while it is up) so player inventory, chest and backpack are
+  usable at the same time. Pressing the hotkey again closes only the backpack panel.
+* The backpack panel supports the standard container controls: shift quick-move, right-click transfer, stack splitting,
+  drag and drop, take-all and stack-all. With a chest open, shift moves items from both the player inventory and the
+  backpack into the chest; shift out of the chest goes to the player inventory and overflows into the backpack when
+  there is no room. Without a chest, the backpack exchanges with the player inventory.
+* The backpack panel is mouse-only for now: it is not reachable by gamepad UI-group cycling.
+
 # 1.9.14.1 - Morgott's fork: hotkeys work on any keyboard layout
 * Open backpack, quickdrop and the Wisplight toggle are bound to the physical key instead of the layout-dependent
   one, so they fire on a Russian (or any non-QWERTY) layout. The three hotkey settings are now plain keys
