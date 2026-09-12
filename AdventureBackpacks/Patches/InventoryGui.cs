@@ -198,7 +198,9 @@ internal static class InventoryGuiPatches
         {
             // A real container is open (not the player's own backpack container): show the backpack as a
             // third panel next to it instead of replacing it.
-            if (instance.m_currentContainer != null && !instance.m_currentContainer.name.Equals("Player(Clone)"))
+            // The mod's own backpack container is the Container component on the player object
+            // (PlayerExtensions.OpenBackpack); anything else is a real container in the world.
+            if (instance.m_currentContainer != null && instance.m_currentContainer != player.gameObject.GetComponent<Container>())
             {
                 BackpackPanel.Open(player, instance);
                 return false;

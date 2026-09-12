@@ -1,5 +1,6 @@
 using AdventureBackpacks.Configuration;
 using AdventureBackpacks.Extensions;
+using AdventureBackpacks.Patches;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -108,7 +109,13 @@ public static class QuickTransfer
 
             _inventoryGuiInstance = __instance;
             
-            if (grid.m_inventory == containerInventory)
+            // Same target rules as shift-move while the extra backpack panel is open.
+            if (BackpackPanel.TryRoute(__instance, grid.m_inventory, item, out var routed))
+            {
+                _fromInventory = grid.m_inventory;
+                _toInventory = routed;
+            }
+            else if (grid.m_inventory == containerInventory)
             {
                 _fromInventory = containerInventory;
                 _toInventory = playerInventory;
@@ -118,6 +125,9 @@ public static class QuickTransfer
                 _fromInventory = playerInventory;
                 _toInventory = containerInventory;
             }
+
+            if (_fromInventory == _toInventory)
+                return;
 
             _processingRightClick = true;
         }
