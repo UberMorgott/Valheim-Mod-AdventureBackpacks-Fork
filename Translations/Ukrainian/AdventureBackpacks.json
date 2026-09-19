@@ -1,0 +1,46 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Сумка",
+  "adventurebackpacks_item_backpack_meadows_description": "Маленька сумка, в яку можна помістити кілька речей.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Міцний рюкзак",
+  "adventurebackpacks_item_backpack_blackforest_description": "Міцний рюкзак, посилений пряжками і тонкими шкіряними ремінцями",
+
+  "adventurebackpacks_item_backpack_swamp": "Водонепроникна сумка",
+  "adventurebackpacks_item_backpack_swamp_description": "Водонепроникна сумка закрита водонепроникними мішками для крові..",
+
+  "adventurebackpacks_item_backpack_mountains": "Пошарпаний арктичний рюкзак",
+  "adventurebackpacks_item_backpack_mountains_description": "Арктичний рюкзак для тривалих походів у гори.",
+
+  "adventurebackpacks_item_backpack_plains": "Посилена шкіряна сумка із локса",
+  "adventurebackpacks_item_backpack_plains_description": "Сумка для авантюристів, виготовлена ​​з надзвичайно міцної шкіри локса.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Рюкзак дослідника",
+  "adventurebackpacks_item_backpack_mistlands_description": "Містичний рюкзак тонкої роботи. Розроблено з власною бездонною кишенею. Ніхто насправді не знає, як це працює.",
+
+  "adventurebackpacks_item_rugged_backpack": "Стародавній міцний рюкзак",
+  "adventurebackpacks_item_rugged_backpack_description": "Стародавній міцний рюкзак, посилений пряжками і тонкими шкіряними ремінцями.",
+
+  "adventurebackpacks_item_arctic_backpack": "Стародавній арктичний рюкзак",
+  "adventurebackpacks_item_arctic_backpack_description": "Арктичний рюкзак, який підходить для тривалих гірських походів.",
+
+  "adventurebackpacks_no_inception": "Ви розгнівили богів!",
+
+  "adventurebackpacks_no_inception1": "Не засмучуй богів.",
+  "adventurebackpacks_no_inception2": "Вас попередили.",
+  "adventurebackpacks_no_inception3": "Ви розгнівили богів!",
+  "adventurebackpacks_no_inception4": "Зітхнув... Тор скоро подбає про вас.",
+  "adventurebackpacks_no_inception5": "Тор позбавив тебе сил!!",
+
+  "adventurebackpacks_thor_saves_contents": "Цей рюкзак містив речі. Тор зберіг його для вас.",
+
+  "adventurebackpacks_useful_backpack": "Ваш рюкзак виглядає корисним...",
+  "adventurebackpacks_you_dropped_bag": "Ти впустив сумку!",
+  "adventurebackpacks_level": "Рівень",
+  "adventurebackpacks_effect": "Ефект",
+  "adventurebackpacks_quick_drop_unavailable": "Швидке скидання недоступне.",
+
+  "adventurebackpacks_se_cold_immunity": "Стійкість до холоду",
+  "adventurebackpacks_se_frost_resistance": "Опір морозу",
+  "adventurebackpacks_se_wet_resistance": "Стійкість до води",
+  "adventurebackpacks_yard_sale_blocked": "Не вдалося спорожнити рюкзак; видалення предметів заблоковано. Рюкзак не було переміщено."
+}

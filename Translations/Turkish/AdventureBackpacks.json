@@ -1,0 +1,46 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Seyahat Çantası",
+  "adventurebackpacks_item_backpack_meadows_description": "Eşya taşıyabilen küçük bir sırt çantası.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Sağlam Sırt Çantası",
+  "adventurebackpacks_item_backpack_blackforest_description": "Tokalar ve kaliteli deri kayışlarla donatılmış sağlam bir sırt çantası.",
+
+  "adventurebackpacks_item_backpack_swamp": "Kan Torbası Su Geçirmez Çanta",
+  "adventurebackpacks_item_backpack_swamp_description": "Su geçirmez kan torbalarıyla sızdırmaz hale getirilmiş dayanıklı bir sırt çantası.",
+
+  "adventurebackpacks_item_backpack_mountains": "Arktik Dağcı Çantası",
+  "adventurebackpacks_item_backpack_mountains_description": "Dağlarda uzun yolculuklar için uygun bir arktik sırt çantası.",
+
+  "adventurebackpacks_item_backpack_plains": "Lox Derisi Maceracı Çantası",
+  "adventurebackpacks_item_backpack_plains_description": "Son derece dayanıklı lox derisinden yapılmış bir macera sırt çantası.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Kaşifin Sis Çantası",
+  "adventurebackpacks_item_backpack_mistlands_description": "İnce bir işçilikle yapılmış, gizemli bir sırt çantası. Kendi saklama kutusuyla gelir, nasıl çalıştığı tam bir muamma.",
+
+  "adventurebackpacks_item_rugged_backpack": "Eski Sağlam Sırt Çantası",
+  "adventurebackpacks_item_rugged_backpack_description": "Tokalar ve kaliteli deri kayışlarla donatılmış eski bir sağlam sırt çantası.",
+
+  "adventurebackpacks_item_arctic_backpack": "Eski Arktik Sırt Çantası",
+  "adventurebackpacks_item_arctic_backpack_description": "Dağlarda uzun yolculuklar için uygun eski bir arktik sırt çantası.",
+
+  "adventurebackpacks_no_inception1": "Onu kızdırma.",
+  "adventurebackpacks_no_inception2": "Uyarıldın.",
+  "adventurebackpacks_no_inception3": "Onu kızdırdın!",
+  "adventurebackpacks_no_inception4": "Ah... Thor yakında seninle ilgilenecek.",
+  "adventurebackpacks_no_inception5": "Thor güçlerini elinden aldı!!",
+
+  "adventurebackpacks_thor_saves_contents": "O çantada eşyalar vardı. Thor onları senin için kurtardı.",
+  
+  "adventurebackpacks_useful_backpack": "Sırt çantan oldukça kullanışlı hissettiriyor.",
+  "adventurebackpacks_you_dropped_bag": "Bir sırt çantası düşürdün!",
+  "adventurebackpacks_level": "Seviye",
+  "adventurebackpacks_effect": "Efekt",
+  "adventurebackpacks_quick_drop_unavailable": "Hızlı Bırakma Kullanılamıyor.",
+  
+  "adventurebackpacks_se_cold_immunity": "Soğuk Bağışıklığı",
+  "adventurebackpacks_se_frost_resistance": "Buz Dayanıklılığı",
+  "adventurebackpacks_se_wet_resistance": "Su Dayanıklılığı",
+  "adventurebackpacks_yard_sale_blocked": "Çanta boşaltılamadı; öğe kaldırma engellendi. Sırt çantası taşınmadı.",
+
+  "item_friendlyskeletonwand_spectralshroud_backpack": "Hayalet Saklama Örtüsü"
+}

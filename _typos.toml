@@ -1,0 +1,29 @@
+# Project typos config, layered on top of the quality gate's own.
+
+[files]
+extend-exclude = [
+  # Non-English translations (English source lives in AdventureBackpacks/Translations/English.json);
+  # an English dictionary flags real French/German/Norwegian words here (affaires, Ein, som, Effekt).
+  "Translations/",
+  # Unity project: third-party vendored content, not ours.
+  "UnityProjects/adventurebackpacks/adventurebackpacks/Assets/ai.meshy/",              # Meshy Bridge package (package.json, Third-Party Notices.txt)
+  "UnityProjects/adventurebackpacks/adventurebackpacks/Assets/MeshyImports/",          # Meshy AI generated model imports (auto-named files)
+  "UnityProjects/adventurebackpacks/adventurebackpacks/Assets/Shader/",                # ported shaders, sources/licenses listed in its README.md
+  "UnityProjects/adventurebackpacks/adventurebackpacks/Assets/Old_Survival_Backpack/", # asset store pack
+]
+
+[default]
+extend-ignore-re = [
+  # ReSharper's own settings namespace, spelled this way by JetBrains in every *.DotSettings file.
+  "urn:shemas-jetbrains-com:settings-storage-xaml",
+]
+
+[default.extend-identifiers]
+# Upstream public API (AdventureBackpacks.API.ABAPI, documented in Docs/AdventureBackpacksAPI.md); other mods call it.
+GetRegisterdStatusEffects = "GetRegisterdStatusEffects"
+# Unity serialized keys: LightingSettings (scenes / .lighting) and PlayerSettings (ProjectSettings.asset).
+m_PVREnvironmentMIS = "m_PVREnvironmentMIS"
+ps4pnSessions = "ps4pnSessions"
+ps4pnPresence = "ps4pnPresence"
+ps4pnFriends = "ps4pnFriends"
+ps4pnGameCustomData = "ps4pnGameCustomData"

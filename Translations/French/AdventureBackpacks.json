@@ -1,0 +1,46 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Sac à dos",
+  "adventurebackpacks_item_backpack_meadows_description": "Un petit sac capable de contenir quelques affaires",
+
+  "adventurebackpacks_item_backpack_blackforest": "Sac à dos robuste",
+  "adventurebackpacks_item_backpack_blackforest_description": "Un sac à dos robuste, renforcé de boucles et de fines lanières de cuir.",
+
+  "adventurebackpacks_item_backpack_swamp": "Sac imperméable",
+  "adventurebackpacks_item_backpack_swamp_description": "Un sac à dos résistant, imperméabilisé avec des poches de sang.",
+
+  "adventurebackpacks_item_backpack_mountains": "Sac de sherpa",
+  "adventurebackpacks_item_backpack_mountains_description": "Un sac à dos arctique, adapté pour de longues randonnées en montagne.",
+
+  "adventurebackpacks_item_backpack_plains": "Sac renforcé en cuir de lox",
+  "adventurebackpacks_item_backpack_plains_description": "Un sac d'aventurier fait avec du cuir de lox extrêmement résistant.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Sac-feu-follet d'explorateur",
+  "adventurebackpacks_item_backpack_mistlands_description": "Un sac à dos mystique, finement ouvragé. Conçu avec sa propre poche sans fond. Personne ne sait vraiment comment il fonctionne.",
+
+  "adventurebackpacks_item_rugged_backpack": "Ancien sac à dos robuste",
+  "adventurebackpacks_item_rugged_backpack_description": "Un sac à dos robuste, renforcé de boucles et de fines lanières de cuir.",
+
+  "adventurebackpacks_item_arctic_backpack": "Ancien sac arctique",
+  "adventurebackpacks_item_arctic_backpack_description": "Un sac à dos arctique, adapté pour de longues randonnées en montagne.",
+  
+  "adventurebackpacks_no_inception": "Vous avez provoqué la colère des dieux!",
+
+  "adventurebackpacks_no_inception1": "Ne fâchez pas les dieux.",
+  "adventurebackpacks_no_inception2": "Tu étais prévenu.",
+  "adventurebackpacks_no_inception3": "Vous avez provoqué la colère des dieux !",
+  "adventurebackpacks_no_inception4": "Soupir... Thor s'occupera de vous bientôt.",
+  "adventurebackpacks_no_inception5": "Thor vous a dépouillé de vos pouvoirs !!",
+
+  "adventurebackpacks_thor_saves_contents": "Ce sac à dos contenait des trucs. Thor l'a gardé pour vous.",
+
+  "adventurebackpacks_useful_backpack": "Votre sac à dos a l'air utile...",
+  "adventurebackpacks_you_dropped_bag": "Vous avez laissé tomber votre sac !",
+  "adventurebackpacks_level": "Niveau",
+  "adventurebackpacks_effect": "Effet",
+  "adventurebackpacks_quick_drop_unavailable": "Dépôt rapide indisponible.",
+
+  "adventurebackpacks_se_cold_immunity": "Immunité au froid",
+  "adventurebackpacks_se_frost_resistance": "Résistance au gel",
+  "adventurebackpacks_se_wet_resistance": "Résistance à l'eau",
+  "adventurebackpacks_yard_sale_blocked": "Impossible de vider le sac ; la suppression d'objet a été bloquée. Le sac n'a pas été déplacé."
+}

@@ -1,0 +1,138 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <Configurations>Debug;Release;API</Configurations>
+        <RootNamespace>AdventureBackpacks</RootNamespace>
+        <AssemblyName>AdventureBackpacks</AssemblyName>
+        <LangVersion>latest</LangVersion>
+        <!-- Items are listed explicitly: the API configuration compiles a subset. -->
+        <EnableDefaultItems>false</EnableDefaultItems>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <!-- Jotunn resolves VALHEIM_INSTALL (Steam registry, or an untracked Environment.props / env var)
+             and publicizes the game assemblies it references from there before each build. -->
+        <ExecutePrebuild>true</ExecutePrebuild>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <!-- Embedded portable PDB: the plugin DLL is the whole deployable and stays byte-reproducible. -->
+        <DebugType>embedded</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'API|AnyCPU' ">
+        <AssemblyName>AdventureBackpacksAPI</AssemblyName>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <OutputPath>bin\API\</OutputPath>
+        <DefineConstants>API;TRACE</DefineConstants>
+        <Optimize>true</Optimize>
+        <DebugType>pdbonly</DebugType>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <DocumentationMarkdown>$(MSBuildProjectDirectory)\..\Docs\AdventureBackpacksAPI.md</DocumentationMarkdown>
+        <DocumentationFile>bin\API\AdventureBackpacksAPI.xml</DocumentationFile>
+        <VsxmdAutoDeleteXml>True</VsxmdAutoDeleteXml>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- JotunnLib 2.30.0 references UnityEngine.ProfilerModule, which Valheim 1.0.12 no longer ships. -->
+        <Reference Remove="UnityEngine.ProfilerModule" />
+        <Reference Include="BepInEx.Harmony">
+            <HintPath>$(BEPINEX_PATH)\core\BepInEx.Harmony.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
+        <Compile Include="Assets\Backpacks.cs" />
+        <Compile Include="Assets\Effects\ColdResistance.cs" />
+        <Compile Include="Assets\Effects\Demister.cs" />
+        <Compile Include="Assets\Effects\EffectsBase.cs" />
+        <Compile Include="Assets\Effects\FeatherFall.cs" />
+        <Compile Include="Assets\Effects\FrostResistance.cs" />
+        <Compile Include="Assets\Effects\TrollArmor.cs" />
+        <Compile Include="Assets\Effects\Waterproof.cs" />
+        <Compile Include="Assets\Factories\AssetFactory.cs" />
+        <Compile Include="Assets\Factories\BackpackFactory.cs" />
+        <Compile Include="Assets\Factories\EffectsFactory.cs" />
+        <Compile Include="Assets\Factories\FactoryBase.cs" />
+        <Compile Include="Assets\Items\AssetItem.cs" />
+        <Compile Include="Assets\Items\BackpackItem.cs" />
+        <Compile Include="Assets\Items\BackpackRecipe.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackBlackForest.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackMeadows.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackMistlands.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackMountains.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackPlains.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackSwamp.cs" />
+        <Compile Include="Assets\Items\BackpackItems\LegacyIronBackpack.cs" />
+        <Compile Include="Assets\Items\BackpackItems\LegacySilverBackpack.cs" />
+        <Compile Include="Components\BackpackComponent.cs" />
+        <Compile Include="Components\BackpackDataStore.cs" />
+        <Compile Include="Configuration\ConfigRegistry.cs" />
+        <Compile Include="Configuration\ModLogger.cs" />
+        <Compile Include="Extensions\InventoryExtensions.cs" />
+        <Compile Include="Extensions\ItemDataExtensions.cs" />
+        <Compile Include="Extensions\PlayerExtensions.cs" />
+        <Compile Include="Features\EquipmentEffectCache.cs" />
+        <Compile Include="Features\PieceShaderSwap.cs" />
+        <Compile Include="Features\QuickTransfer.cs" />
+        <Compile Include="Patches\ArmorStand.cs" />
+        <Compile Include="Patches\BackpackPanel.cs" />
+        <Compile Include="Patches\Container.cs" />
+        <Compile Include="Patches\Door.cs" />
+        <Compile Include="Patches\EnvMan.cs" />
+        <Compile Include="Patches\GuiBar.cs" />
+        <Compile Include="Patches\Humanoid.cs" />
+        <Compile Include="Patches\Inventory.cs" />
+        <Compile Include="Patches\InventoryGui.cs" />
+        <Compile Include="Patches\ItemDrop.cs" />
+        <Compile Include="Patches\Player.cs" />
+        <Compile Include="Patches\SEMan.cs" />
+        <Compile Include="Patches\VisEquipment.cs" />
+        <Compile Include="AdventureBackpacks.cs" />
+        <Compile Include="Assets\Effects\ExternalEffect.cs" />
+        <Compile Include="Assets\Items\BackpackItems\ExternalBackpack.cs" />
+        <Compile Include="Compats\ChebsNecromancy.cs" />
+        <Compile Include="Features\Utilities.cs" />
+        <EmbeddedResource Include="Assets\Bundles\chebsbackpack" />
+        <EmbeddedResource Include="Assets\Icons\SilverBackpack_Icon.png" />
+        <Compile Include="Patches\ItemStand.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="API\ABAPI.cs" />
+        <Compile Include="API\Privates.cs" />
+        <Compile Include="API\Structs.cs" />
+        <Compile Include="Compats\ContentsWithin.cs" />
+        <Compile Include="Patches\InventoryGrid.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_black_forest" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_meadows" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_mistlands" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_mountains" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_plains" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_swamp" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="App.config" />
+    </ItemGroup>
+    <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
+        <EmbeddedResource Include="Translations\English.json" />
+        <EmbeddedResource Include="Assets\Bundles\adventurebackpacks" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="JotunnLib" Version="2.30.0" />
+        <PackageReference Include="Vsxmd" Version="1.4.6" PrivateAssets="all" />
+        <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    </ItemGroup>
+</Project>

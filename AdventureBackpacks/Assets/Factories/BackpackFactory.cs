@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AdventureBackpacks.API;
+using AdventureBackpacks.Assets.Items;
+using AdventureBackpacks.Assets.Items.BackpackItems;
+using AdventureBackpacks.Configuration;
+
+namespace AdventureBackpacks.Assets.Factories;
+
+
+internal class BackpackFactory : AssetFactory
+{
+    private static HashSet<BackpackItem> _backpackItems = new();
+    private static bool _initialized;
+    private static List<ABAPI.BackpackDefinition> _externalBackpacks = new();
+
+    internal static IEnumerable<BackpackItem> BackpackItems => _backpackItems;
+
+
+    internal BackpackFactory(ModLogger logger, ConfigRegistry configSync) : base(logger, configSync)
+    {
+        if (!_initialized)
+        {
+            BackpackItem.SetConfig(configSync);
+            BackpackItem.SetLogger(logger);
+            _initialized = true;
+        }
+    }
+
+    public static void RegisterExternalBackpack(ABAPI.BackpackDefinition backpackDefinition)
+    {
+        _externalBackpacks.Add(backpackDefinition);
+    }
+
+
+    internal override void CreateAssets()
+    {
+        _backpackItems.Add(new BackpackMeadows("backpack_meadows", "BackpackMeadows", "$adventurebackpacks_item_backpack_meadows"));
+        _backpackItems.Add(new BackpackBlackForest("backpack_black_forest", "BackpackBlackForest", "$adventurebackpacks_item_backpack_blackforest"));
+        _backpackItems.Add(new BackpackSwamp("backpack_swamp", "BackpackSwamp", "$adventurebackpacks_item_backpack_swamp"));
+        _backpackItems.Add(new BackpackMountains("backpack_mountains", "BackpackMountains", "$adventurebackpacks_item_backpack_mountains"));
+        _backpackItems.Add(new BackpackPlains("backpack_plains", "BackpackPlains", "$adventurebackpacks_item_backpack_plains"));
+        _backpackItems.Add(new BackpackMistlands("backpack_mistlands", "BackpackMistlands", "$adventurebackpacks_item_backpack_mistlands"));
+        _backpackItems.Add(new LegacyIronBackpack("adventurebackpacks", "CapeIronBackpack", "$adventurebackpacks_item_rugged_backpack"));
+        _backpackItems.Add(new LegacySilverBackpack("adventurebackpacks", "CapeSilverBackpack", "$adventurebackpacks_item_arctic_backpack"));
+
+        foreach (var backpackDefinition in _externalBackpacks)
+        {
+            if (_backpackItems.Any(x => x.ItemName.Equals(backpackDefinition.ItemName, StringComparison.Ordinal))) return;
+
+            var newBackpack = backpackDefinition.BackPackGo != null ?
+                new ExternalBackpack(backpackDefinition, backpackDefinition.BackPackGo) :
+                new ExternalBackpack(backpackDefinition);
+
+            _backpackItems.Add(newBackpack);
+
+        }
+    }
+
+    internal static List<string> BackpackTypes()
+    {
+        return BackpackItems.Select(x => x.ItemName).ToList();
+    }
+}

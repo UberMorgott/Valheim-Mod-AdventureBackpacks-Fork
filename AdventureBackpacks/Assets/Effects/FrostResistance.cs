@@ -1,0 +1,64 @@
+﻿using AdventureBackpacks.Extensions;
+using Jotunn.Entities;
+using UnityEngine;
+
+namespace AdventureBackpacks.Assets.Effects;
+
+public class FrostResistance : EffectsBase
+{
+    private StatusEffect _externalStatusEffect;
+    public static HitData.DamageModPair EffectMod = new() { m_type = HitData.DamageType.Frost, m_modifier = HitData.DamageModifier.Resistant };
+    public FrostResistance(string effectName, string effectDesc) : base(effectName, effectDesc)
+    {
+    }
+    private void LoadExternalStatusEffect()
+    {
+        if (_externalStatusEffect == null)
+        {
+            var freezing = ObjectDB.instance.GetStatusEffect("Freezing".GetStableHashCode());
+            var se = ScriptableObject.CreateInstance<SE_Stats>();
+            se.name = "SE_adventurebackpacks_frost_resistance";
+            se.m_name = "$adventurebackpacks_se_frost_resistance";
+            se.m_icon = freezing.m_icon;
+            _externalStatusEffect = se;
+            // Fixed template: Jotunn adds it to every ObjectDB. Per-backpack effects are built at runtime instead.
+            Jotunn.Managers.ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(se, fixReference: false));
+            SetStatusEffect(_externalStatusEffect);
+        }
+    }
+
+    public override void LoadStatusEffect()
+    {
+        LoadExternalStatusEffect();
+    }
+
+    public override bool HasActiveStatusEffect(Humanoid human, out StatusEffect statusEffect)
+    {
+        LoadExternalStatusEffect();
+        SetStatusEffect(_externalStatusEffect);
+        return base.HasActiveStatusEffect(human, out statusEffect);
+    }
+
+    public override bool HasActiveStatusEffect(ItemDrop.ItemData item, out StatusEffect statusEffect)
+    {
+        LoadExternalStatusEffect();
+        SetStatusEffect(_externalStatusEffect);
+        return base.HasActiveStatusEffect(item, out statusEffect);
+    }
+
+    public override bool IsEffectActive(Humanoid human)
+    {
+        if (human is Player player)
+        {
+            var equippedBackpack = player.GetEquippedBackpack();
+
+            if (equippedBackpack == null || !EnabledEffect.Value)
+                return false;
+
+            var itemData = equippedBackpack.Item;
+            return IsEffectActive(itemData);
+        }
+
+        return false;
+    }
+}

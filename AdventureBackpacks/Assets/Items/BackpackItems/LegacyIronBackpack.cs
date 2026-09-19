@@ -1,0 +1,37 @@
+using System.Collections.Generic;
+using AdventureBackpacks.Assets.Effects;
+
+namespace AdventureBackpacks.Assets.Items.BackpackItems;
+
+internal class LegacyIronBackpack : BackpackItem
+{
+    public LegacyIronBackpack(string assetName, string prefabName, string itemName) : base(assetName, prefabName, itemName)
+    {
+        RegisterConfigSettings();
+    }
+
+    internal sealed override void RegisterConfigSettings()
+    {
+        RegisterBackpackBiome();
+        RegisterBackpackSize();
+        RegisterStatusEffectInfo();
+        RegisterWeightMultiplier();
+        RegisterCarryBonus(25);
+        RegisterSpeedMod();
+        RegisterEnableFreezing(false);
+    }
+    internal override Vector2i GetInventorySize(int quality)
+    {
+        return base.GetInventorySize(1);
+    }
+
+    internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
+    {
+        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+
+        if (EnableFreezing.Value)
+            modifierList.Add(FrostResistance.EffectMod);
+
+        statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
+    }
+}

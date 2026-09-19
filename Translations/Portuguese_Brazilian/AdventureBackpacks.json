@@ -1,0 +1,44 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Mochila Pequena",
+  "adventurebackpacks_item_backpack_meadows_description": "Uma pequena mochila para guardar coisas.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Mochila Rústica",
+  "adventurebackpacks_item_backpack_blackforest_description": "Uma mochila rústica, completa com fivelas e tiras de couro fino.",
+
+  "adventurebackpacks_item_backpack_swamp": "Mochila de Bolsa de Sangue",
+  "adventurebackpacks_item_backpack_swamp_description": "Uma mochila resistente, selada com bolsas de sangue à prova d'água.",
+
+  "adventurebackpacks_item_backpack_mountains": "Mochila Xerpa do Ártico",
+  "adventurebackpacks_item_backpack_mountains_description": "Uma mochila do ártico, ideal para longas caminhadas nas montanhas.",
+
+  "adventurebackpacks_item_backpack_plains": "Mochila de Pele de Lox",
+  "adventurebackpacks_item_backpack_plains_description": "Uma mochila de aventureiros, feita com peles de lox bastante resistentes.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Mochila Wisp de Explorador",
+  "adventurebackpacks_item_backpack_mistlands_description": "Uma mochila mística finamente trabalhada. Completa com sua própria Caixa de Cargas. Nínguem sabe bem como ela funciona.",
+
+  "adventurebackpacks_item_rugged_backpack": "Mochila Rústica Velha",
+  "adventurebackpacks_item_rugged_backpack_description": "Uma mochila rústica, completa com fivelas e tiras de couro fino.",
+
+  "adventurebackpacks_item_arctic_backpack": "Mochila do Ártico Velha",
+  "adventurebackpacks_item_arctic_backpack_description": "Uma mochila do ártico, ideal para longas caminhadas nas montanhas.",
+
+  "adventurebackpacks_no_inception1": "Não enfureça aos deuses.",
+  "adventurebackpacks_no_inception2": "Você foi avisado.",
+  "adventurebackpacks_no_inception3": "Você enfureceu aos deuses!",
+  "adventurebackpacks_no_inception4": "Hmm... Thor lidará com você em breve.",
+  "adventurebackpacks_no_inception5": "Thor tirou de você seus poderes!!",
+
+  "adventurebackpacks_thor_saves_contents": "Aquela mochila tinha coisas dentro. Thor a salvou para você.",
+  
+  "adventurebackpacks_useful_backpack": "Sua mochila parece útil.",
+  "adventurebackpacks_you_dropped_bag": "Você largou a mochila!",
+  "adventurebackpacks_level": "Nível",
+  "adventurebackpacks_effect": "Efeito",
+  "adventurebackpacks_quick_drop_unavailable": "Descarte rápido indisponível.",
+
+  "adventurebackpacks_se_cold_immunity": "Imunidade ao frio",
+  "adventurebackpacks_se_frost_resistance": "Resistência à geada",
+  "adventurebackpacks_se_wet_resistance": "Resistência à água",
+  "adventurebackpacks_yard_sale_blocked": "Não foi possível esvaziar a mochila; a remoção de itens foi bloqueada. A mochila não foi movida."
+}

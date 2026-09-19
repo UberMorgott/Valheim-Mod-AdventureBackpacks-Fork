@@ -1,0 +1,53 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventureBackpacks", "AdventureBackpacks\AdventureBackpacks.csproj", "{997CB563-FCC7-44B7-8F71-069747D27CC5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Module Files", "Module Files", "{125A2AE5-FB75-4EED-B971-3E0C9C056DA0}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		manifest.json = manifest.json
+		icon.png = icon.png
+		CHANGELOG.md = CHANGELOG.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Translations", "Translations", "{453B1EE0-9980-4B66-93B3-2DDBD21FEE03}"
+	ProjectSection(SolutionItems) = preProject
+		Translations\AdventureBackpacks.French.json = Translations\AdventureBackpacks.French.json
+		Translations\AdventureBackpacks.German.json = Translations\AdventureBackpacks.German.json
+		Translations\AdventureBackpacks.Norwegian.json = Translations\AdventureBackpacks.Norwegian.json
+		Translations\AdventureBackpacks.Russian.json = Translations\AdventureBackpacks.Russian.json
+		Translations\AdventureBackpacks.Korean.json = Translations\AdventureBackpacks.Korean.json
+		Translations\AdventureBackpacks.Czech.json = Translations\AdventureBackpacks.Czech.json
+		Translations\AdventureBackpacks.Swedish.json = Translations\AdventureBackpacks.Swedish.json
+		Translations\AdventureBackpacks.Spanish.json = Translations\AdventureBackpacks.Spanish.json
+		Translations\AdventureBackpacks.Japanese.json = Translations\AdventureBackpacks.Japanese.json
+		Translations\AdventureBackpacks.Portuguese_Brazilian.json = Translations\AdventureBackpacks.Portuguese_Brazilian.json
+		Translations\AdventureBackpacks.Chinese_Trad.json = Translations\AdventureBackpacks.Chinese_Trad.json
+		Translations\AdventureBackpacks.Chinese.json = Translations\AdventureBackpacks.Chinese.json
+		Translations\AdventureBackpacks.Ukrainian.json = Translations\AdventureBackpacks.Ukrainian.json
+		Translations\AdventureBackpacks.Polish.json = Translations\AdventureBackpacks.Polish.json
+		Translations\AdventureBackpacks.Turkish.json = Translations\AdventureBackpacks.Turkish.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{D68E7D37-E82E-4419-BA0E-18C7EAD3F38B}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\AdventureBackpacksAPI.md = Docs\AdventureBackpacksAPI.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		API|Any CPU = API|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.API|Any CPU.ActiveCfg = API|Any CPU
+		{997CB563-FCC7-44B7-8F71-069747D27CC5}.API|Any CPU.Build.0 = API|Any CPU	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{453B1EE0-9980-4B66-93B3-2DDBD21FEE03} = {125A2AE5-FB75-4EED-B971-3E0C9C056DA0}
+	EndGlobalSection
+EndGlobal

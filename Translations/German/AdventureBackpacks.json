@@ -1,0 +1,44 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Tornister",
+  "adventurebackpacks_item_backpack_meadows_description": "Eine kleine Tasche, die Dinge beinhalten kann.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Grober Rucksack",
+  "adventurebackpacks_item_backpack_blackforest_description": "Ein robuster Rucksack mit Schnallen und feinen Lederriemen.",
+
+  "adventurebackpacks_item_backpack_swamp": "Blutsack-Wetpack",
+  "adventurebackpacks_item_backpack_swamp_description": "Ein haltbarer Rucksack, sicher verschlossen durch die Einarbeitung wasserdichter Blutsäcke.",
+
+  "adventurebackpacks_item_backpack_mountains": "Arktischer Sherpa-Beutel",
+  "adventurebackpacks_item_backpack_mountains_description": "Ein arktischer Rucksack, geeignet für lange Wanderungen in den Bergen.",
+
+  "adventurebackpacks_item_backpack_plains": "Loxfell-Rucksack",
+  "adventurebackpacks_item_backpack_plains_description": "Ein Abenteurer-Rucksack, der aus widerstandsfähigem Loxfell gefertigt wurde.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Rucksack des Explorators",
+  "adventurebackpacks_item_backpack_mistlands_description": "Ein fein gearbeiteter, mystischer Rucksack mit ganz eigener Handhabung. Niemand weiß genau, wie er funktioniert.",
+
+  "adventurebackpacks_item_rugged_backpack": "Vielseitiger Rucksack",
+  "adventurebackpacks_item_rugged_backpack_description": "Ein vielseitiger Rucksack, an jedes Terrain angepasst.",
+  
+  "adventurebackpacks_item_arctic_backpack": "Arktischer Rucksack",
+  "adventurebackpacks_item_arctic_backpack_description": "Ein Arktis-Rucksack für lange Bergwanderungen im Winter.",
+  
+  "adventurebackpacks_no_inception1": "Ärgere die Götter nicht.",
+  "adventurebackpacks_no_inception2": "Du wurdest gewarnt.",
+  "adventurebackpacks_no_inception3": "Du hast die Götter erzürnt!",
+  "adventurebackpacks_no_inception4": "Seufz ... Thor wird sich bald um dich kümmern.",
+  "adventurebackpacks_no_inception5": "Thor hat dich deiner Kräfte beraubt!!",
+
+  "adventurebackpacks_thor_saves_contents": "In diesem Rucksack war was drin. Thor hat es für dich gespeichert.",
+
+  "adventurebackpacks_useful_backpack": "Dein Rucksack fühlt sich nützlich.",
+  "adventurebackpacks_you_dropped_bag": "Du hast einen Rucksack fallen lassen!",
+  "adventurebackpacks_level": "Level",
+  "adventurebackpacks_effect": "Effekt",
+  "adventurebackpacks_quick_drop_unavailable": "Schnelles Ablegen nicht verfügbar.",
+
+  "adventurebackpacks_se_cold_immunity": "Kälteimmunität",
+  "adventurebackpacks_se_frost_resistance": "Frostwiderstand",
+  "adventurebackpacks_se_wet_resistance": "Wasserresistenz",
+  "adventurebackpacks_yard_sale_blocked": "Rucksack konnte nicht geleert werden; Entfernen wurde blockiert. Rucksack wurde nicht bewegt."
+}

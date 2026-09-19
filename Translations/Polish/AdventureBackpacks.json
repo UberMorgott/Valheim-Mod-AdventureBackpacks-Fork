@@ -1,0 +1,46 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Tornister",
+  "adventurebackpacks_item_backpack_meadows_description": "Mały plecak zdolny pomieścić kilka przedmiotów.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Skórzany Plecak",
+  "adventurebackpacks_item_backpack_blackforest_description": "Skórzany plecak z klamrami i delikatnymi skórzanymi paskami.",
+
+  "adventurebackpacks_item_backpack_swamp": "Krwawy Plecak",
+  "adventurebackpacks_item_backpack_swamp_description": "Plecak wodoodporny uszczelniony workami na krew.",
+
+  "adventurebackpacks_item_backpack_mountains": "Plecak Górski",
+  "adventurebackpacks_item_backpack_mountains_description": "Plecak idealnie nadający się na długie wędrówki po górach.",
+
+  "adventurebackpacks_item_backpack_plains": "Plecak ze Skóry Loxa",
+  "adventurebackpacks_item_backpack_plains_description": "Plecak poszukiwaczy przygód wykonany z niezwykle wytrzymałej skóry loxa",
+
+  "adventurebackpacks_item_backpack_mistlands": "Plecak Odkrywcy",
+  "adventurebackpacks_item_backpack_mistlands_description": "Perfekcyjnie wykonany mistyczny plecak w komplecie z własnym pudełkiem na drobiazgi. Nikt nie jest pewien, jak to działa.",
+
+  "adventurebackpacks_item_rugged_backpack": "Wytrzymały Plecak",
+  "adventurebackpacks_item_rugged_backpack_description": "Wytrzymały plecak z klamrami i delikatnymi skórzanymi paskami.",
+
+  "adventurebackpacks_item_arctic_backpack": "Arktyczny Plecak",
+  "adventurebackpacks_item_arctic_backpack_description": "Arktyczny plecak na długie wyprawy po lodowych pustkowiach.",
+
+  "adventurebackpacks_no_inception1": "Nie rozgniewaj bogów.",
+  "adventurebackpacks_no_inception2": "Zostałeś ostrzeżony.",
+  "adventurebackpacks_no_inception3": "Rozgniewałeś bogów!",
+  "adventurebackpacks_no_inception4": "Ech... Thor wkrótce się tobą rozprawi.",
+  "adventurebackpacks_no_inception5": "Thor pozbawił cię mocy!!!",
+
+  "adventurebackpacks_thor_saves_contents": "W plecaku były rzeczy. Thor zatrzymał je dla ciebie.",
+
+  "adventurebackpacks_useful_backpack": "Twój plecak sprawia wrażenie użytecznego.",
+  "adventurebackpacks_you_dropped_bag": "Upuściłeś plecak!",
+  "adventurebackpacks_level": "Poziom",
+  "adventurebackpacks_effect": "Efekt",
+  "adventurebackpacks_quick_drop_unavailable": "Szybkie rzucenie plecaka jest niemożliwe.",
+
+  "adventurebackpacks_se_cold_immunity": "Odporność na zimno",
+  "adventurebackpacks_se_frost_resistance": "Odporność na mróz",
+  "adventurebackpacks_se_wet_resistance": "Odporność na wodę",
+  "adventurebackpacks_yard_sale_blocked": "Nie można opróżnić plecaka; usuwanie przedmiotów zostało zablokowane. Plecak nie został przeniesiony.",
+
+  "item_friendlyskeletonwand_spectralshroud_backpack": "Widmowy Całun Utrzymania"
+}

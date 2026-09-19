@@ -1,0 +1,44 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Sekk",
+  "adventurebackpacks_item_backpack_meadows_description": "En liten sekk som er i stand til å holde ting.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Robust sekk",
+  "adventurebackpacks_item_backpack_blackforest_description": "En robust sekk med spenner og fine lærremmer.",
+
+  "adventurebackpacks_item_backpack_swamp": "Blodsekk Våtsekk",
+  "adventurebackpacks_item_backpack_swamp_description": "En slitesterk sekk som er forseglet med vanntette blodposer.",
+
+  "adventurebackpacks_item_backpack_mountains": "Arktisk Sherpa-sekk",
+  "adventurebackpacks_item_backpack_mountains_description": "En arktisk sekk, egnet for lange turer gjennom fjellene.",
+
+  "adventurebackpacks_item_backpack_plains": "Lox Skinn Knappsack",
+  "adventurebackpacks_item_backpack_plains_description": "En eventyrsekk laget av svært slitesterkt lox skinn.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Oppdagers Wisppack",
+  "adventurebackpacks_item_backpack_mistlands_description": "En fint håndlaget, mystisk sekk. Komplett med sin egen boks med oppbevaring. Ingen er helt sikre på hvordan det virker.",
+
+  "adventurebackpacks_item_rugged_backpack": "Gammel robust sekk",
+  "adventurebackpacks_item_rugged_backpack_description": "En robust sekk med spenner og fine lærremmer.",
+
+  "adventurebackpacks_item_arctic_backpack": "Gammel arktisk sekk",
+  "adventurebackpacks_item_arctic_backpack_description": "En arktisk sekk, egnet for lange turer gjennom fjellene.",
+
+  "adventurebackpacks_no_inception1": "Ikke irriter gudene.",
+  "adventurebackpacks_no_inception2": "Du har blitt advart.",
+  "adventurebackpacks_no_inception3": "Du har irritert gudene!",
+  "adventurebackpacks_no_inception4": "Sukk ... Thor vil ta seg av deg snart.",
+  "adventurebackpacks_no_inception5": "Thor har fratatt deg dine krefter!!",
+
+  "adventurebackpacks_thor_saves_contents": "Den ryggsekken hadde ting i seg. Thor har lagret det for deg.",
+
+  "adventurebackpacks_useful_backpack": "Din sekk føles nyttig.",
+  "adventurebackpacks_you_dropped_bag": "Du slapp en sekk!",
+  "adventurebackpacks_level": "Nivå",
+  "adventurebackpacks_effect": "Effekt",
+  "adventurebackpacks_quick_drop_unavailable": "Hurtigfall ikke tilgjengelig.",
+
+  "adventurebackpacks_se_cold_immunity": "Kuldeimmunitet",
+  "adventurebackpacks_se_frost_resistance": "Frostmotstand",
+  "adventurebackpacks_se_wet_resistance": "Vanntett",
+  "adventurebackpacks_yard_sale_blocked": "Kunne ikke tømme ryggsekken; fjerning av gjenstander ble blokkert. Ryggsekken ble ikke flyttet."
+}

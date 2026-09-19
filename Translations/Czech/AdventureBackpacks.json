@@ -1,0 +1,44 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Brašna",
+  "adventurebackpacks_item_backpack_meadows_description": "Malá brašna, do které se vejdou věci.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Kožený batoh",
+  "adventurebackpacks_item_backpack_blackforest_description": "Kožený batoh s přezkami a jemnými koženými řemínky.",
+
+  "adventurebackpacks_item_backpack_swamp": "Voděodolný batoh",
+  "adventurebackpacks_item_backpack_swamp_description": "Voděodolný batoh uzavřený pomocí vodotěsných krevních vaků.",
+
+  "adventurebackpacks_item_backpack_mountains": "Zimní batoh",
+  "adventurebackpacks_item_backpack_mountains_description": "Zimní batoh vhodný na dlouhé túry po horách.",
+
+  "adventurebackpacks_item_backpack_plains": "Loxý batoh",
+  "adventurebackpacks_item_backpack_plains_description": "Dobrodružný batoh vyrobený z extrémně odolné kůže z loxu.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Mystický batoh",
+  "adventurebackpacks_item_backpack_mistlands_description": "Precizně zpracovaný mystický batoh. S vlastní krabičkou na drobnosti. Nikdo si není jistý, jak funguje.",
+
+  "adventurebackpacks_item_rugged_backpack": "Kožený batoh",
+  "adventurebackpacks_item_rugged_backpack_description": "Kožený batoh s přezkami a jemnými koženými řemínky.",
+
+  "adventurebackpacks_item_arctic_backpack": "Zimní batoh",
+  "adventurebackpacks_item_arctic_backpack_description": "Zimní batoh vhodný na dlouhé túry po horách.",
+
+  "adventurebackpacks_no_inception1": "Nepokoušej bohy.",
+  "adventurebackpacks_no_inception2": "Byl jsi varován.",
+  "adventurebackpacks_no_inception3": "Rozhněval jsi bohy!",
+  "adventurebackpacks_no_inception4": "Povzdech... Thor se o tebe brzy postará.",
+  "adventurebackpacks_no_inception5": "Thor tě připravil o tvou moc!!!",
+
+  "adventurebackpacks_thor_saves_contents": "V tom batohu byly záhadné věci. Thor si je schoval pro sebe.",
+
+  "adventurebackpacks_useful_backpack": "Tvůj batoh se zdá být užitečný",
+  "adventurebackpacks_you_dropped_bag": "Upustil jsi batoh na zem!",
+  "adventurebackpacks_level": "Level",
+  "adventurebackpacks_effect": "Effekt",
+  "adventurebackpacks_quick_drop_unavailable": "Rychlé odložení nedostupné.",
+
+  "adventurebackpacks_se_cold_immunity": "Odpovídavost proti chladu",
+  "adventurebackpacks_se_frost_resistance": "Odolnost proti mrazu",
+  "adventurebackpacks_se_wet_resistance": "Odolnost proti vodě",
+  "adventurebackpacks_yard_sale_blocked": "Batoh se nepodařilo vyprázdnit; odebrání předmětů bylo zablokováno. Batoh nebyl přesunut."
+}

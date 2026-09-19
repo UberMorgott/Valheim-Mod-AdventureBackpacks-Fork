@@ -1,0 +1,46 @@
+{
+  "adventurebackpacks_item_backpack_meadows": "Satchel",
+  "adventurebackpacks_item_backpack_meadows_description": "A small backpack capable of holding things.",
+
+  "adventurebackpacks_item_backpack_blackforest": "Rugged Backpack",
+  "adventurebackpacks_item_backpack_blackforest_description": "A rugged backpack, complete with buckles and fine leather straps.",
+
+  "adventurebackpacks_item_backpack_swamp": "Bloodbag Wetpack",
+  "adventurebackpacks_item_backpack_swamp_description": "A durable backpack sealed using waterproof blood bags.",
+
+  "adventurebackpacks_item_backpack_mountains": "Arctic Sherpa Pack",
+  "adventurebackpacks_item_backpack_mountains_description": "An arctic backpack, fit for long treks through the mountains.",
+
+  "adventurebackpacks_item_backpack_plains": "Lox Hide Knappsack",
+  "adventurebackpacks_item_backpack_plains_description": "An adventuring backpack made from extremely durable lox hide.",
+
+  "adventurebackpacks_item_backpack_mistlands": "Explorers Wisppack",
+  "adventurebackpacks_item_backpack_mistlands_description": "A finely crafted, mystical backpack. Complete with it's own Box of Holding. No one is quite sure how it works.",
+
+  "adventurebackpacks_item_rugged_backpack": "Old Rugged Backpack",
+  "adventurebackpacks_item_rugged_backpack_description": "A rugged backpack, complete with buckles and fine leather straps.",
+
+  "adventurebackpacks_item_arctic_backpack": "Old Arctic Backpack",
+  "adventurebackpacks_item_arctic_backpack_description": "An arctic backpack, fit for long treks through the mountains.",
+
+  "adventurebackpacks_no_inception1": "Do not anger the gods.",
+  "adventurebackpacks_no_inception2": "You have been warned.",
+  "adventurebackpacks_no_inception3": "You have angered the gods!",
+  "adventurebackpacks_no_inception4": "Sigh... Thor will deal with you soon.",
+  "adventurebackpacks_no_inception5": "Thor has stripped you of your powers!!",
+
+  "adventurebackpacks_thor_saves_contents": "That backpack had stuff in it. Thor saved it for you.",
+  
+  "adventurebackpacks_useful_backpack": "Your backpack feels useful.",
+  "adventurebackpacks_you_dropped_bag": "You dropped a backpack!",
+  "adventurebackpacks_level": "Level",
+  "adventurebackpacks_effect": "Effect",
+  "adventurebackpacks_quick_drop_unavailable": "Quick Drop Unavailable.",
+  
+  "adventurebackpacks_se_cold_immunity": "Cold Immunity",
+  "adventurebackpacks_se_frost_resistance": "Frost Resistance",
+  "adventurebackpacks_se_wet_resistance": "Water Resistance",
+  "adventurebackpacks_yard_sale_blocked": "Could not empty backpack; item removal was blocked. Backpack was not moved.",
+
+  "item_friendlyskeletonwand_spectralshroud_backpack": "Spectral Shroud of Holding"
+}
