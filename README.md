@@ -10,9 +10,7 @@ Credit where it is due:
 - **HD backpack assets:** **psionprime**, from [AdventureBackpacksHD](https://github.com/psionprime/AdventureBackpacksHD)
 - **This fork:** Valheim 1.0.7 compatibility, patch robustness, and EquipmentAndQuickSlots compatibility
 
-Licensed under the MIT licence of the upstream project. `LICENSE.md` keeps Vapok's copyright notice, as the
-licence requires, and adds the copyright line for this fork's modifications. Asset credits are listed in
-`THIRD-PARTY-NOTICES.md`.
+Upstream material retains its MIT licence and unchanged `LICENSE.md` and `THIRD-PARTY-NOTICES.md`. Original contributions by Morgott are offered under CC BY-NC 4.0 within the scope of [CONTRIBUTOR-LICENSE.md](CONTRIBUTOR-LICENSE.md); prior MIT permissions remain valid.
 
 This fork is not published to Thunderstore. `manifest.json` still reports the upstream package version `1.9.13`
 because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.5`.
