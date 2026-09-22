@@ -1,10 +1,14 @@
-## 1.9.14.6 - unreleased
+## 1.9.14.6 - Morgott's fork: backpack effects fixed, lighter textures
 
 * A newly crafted backpack gives its status effect (carry bonus, speed, resistances) right away instead of only after
   a relog. The frost resistance effect now carries the frost resistance it names. (port of upstream 2.0.10)
 * Water and cold resistance only protect the player wearing the backpack. They used to switch rain and cold off for
   the whole world, so fires kept burning in the rain and buildings took no rain wear. Rain no longer wets the wearer,
   a Cold the wearer already had goes away without a message loop. (port of upstream 2.1.9/2.1.10)
+* Backpack textures now match the texel density of vanilla gear, and the unused 4096 mip level of the Mistlands and
+  Swamp textures is gone. The DLL shrinks from 47 MB to 11.4 MB; backpacks look the same in game.
+* Licensing: original contributions by Morgott are now offered under CC BY-NC 4.0 (see `CONTRIBUTOR-LICENSE.md`).
+  Vapok's code and psionprime's HD assets keep their MIT terms, and earlier MIT grants stay valid.
 
 ## 1.9.14.5 - Morgott's fork: support code rewritten as own implementation
 
