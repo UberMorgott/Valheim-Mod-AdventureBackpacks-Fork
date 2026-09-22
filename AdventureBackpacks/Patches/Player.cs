@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using AdventureBackpacks.Assets.Factories;
 using HarmonyLib;
+using JetBrains.Annotations;
 
 namespace AdventureBackpacks.Patches;
 
@@ -14,6 +16,38 @@ public class PlayerPatches
         static void Postfix(Player __instance)
         {
             __instance.gameObject.AddComponent<Container>();
+        }
+    }
+
+    // Weather resistances act on the local player only: vanilla reads the global EnvMan.IsWet/IsCold here
+    // (Player.cs:2217-2218) and also in Fire/Fireplace/Cinder/WearNTear, so the flag scopes
+    // SEManPatches.AddStatusEffectPatch to the env effects this method adds for the local player.
+    [HarmonyPatch(typeof(Player), nameof(Player.UpdateEnvStatusEffects))]
+    internal static class PlayerUpdateEnvStatusEffectsPatch
+    {
+        internal static bool IsUpdatingEnvStatusEffects { get; private set; }
+
+        [UsedImplicitly]
+        private static void Prefix(Player __instance)
+        {
+            IsUpdatingEnvStatusEffects = __instance == Player.m_localPlayer;
+        }
+
+        [UsedImplicitly]
+        private static void Postfix(Player __instance)
+        {
+            if (__instance != Player.m_localPlayer)
+                return;
+
+            foreach (var effect in EffectsFactory.EffectList.Values)
+                effect.OnUpdateEnvStatusEffects(__instance);
+        }
+
+        // Clears the flag even when vanilla or another patch throws.
+        [UsedImplicitly]
+        private static void Finalizer()
+        {
+            IsUpdatingEnvStatusEffects = false;
         }
     }
 

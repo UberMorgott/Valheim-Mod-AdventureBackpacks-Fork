@@ -44,4 +44,17 @@ public class ColdResistance : EffectsBase
         SetStatusEffect(_externalStatusEffect);
         return base.HasActiveStatusEffect(item, out statusEffect);
     }
+
+    // SEManPatches blocks new Cold while the resistance is active; this clears a Cold the player already had
+    // when the backpack was equipped. Quiet like vanilla's Cold -> Freezing swap (Player.cs:2263), so no
+    // "warm" message fires.
+    public override void OnUpdateEnvStatusEffects(Player player)
+    {
+        if (!IsEffectActive(player))
+            return;
+
+        var seMan = player.GetSEMan();
+        if (seMan.HaveStatusEffect(SEMan.s_statusEffectCold))
+            seMan.RemoveStatusEffect(SEMan.s_statusEffectCold, quiet: true);
+    }
 }

@@ -91,7 +91,6 @@
         <Compile Include="Patches\BackpackPanel.cs" />
         <Compile Include="Patches\Container.cs" />
         <Compile Include="Patches\Door.cs" />
-        <Compile Include="Patches\EnvMan.cs" />
         <Compile Include="Patches\GuiBar.cs" />
         <Compile Include="Patches\Humanoid.cs" />
         <Compile Include="Patches\Inventory.cs" />
