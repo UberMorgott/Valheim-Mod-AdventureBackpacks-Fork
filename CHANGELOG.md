@@ -1,3 +1,8 @@
+## 1.9.14.7 - unreleased
+
+* The backpack hotkey works while the inventory is open: it opens the backpack (or the backpack panel next to an open
+  chest) and closes it again. It used to do nothing until the inventory was closed.
+
 ## 1.9.14.6 - Morgott's fork: backpack effects fixed, lighter textures
 
 * A newly crafted backpack gives its status effect (carry bonus, speed, resistances) right away instead of only after

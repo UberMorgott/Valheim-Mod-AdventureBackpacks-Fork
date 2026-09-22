@@ -65,7 +65,9 @@ namespace AdventureBackpacks.Configuration
 
             InitializeConfigurationSettings();
 
-            OpenBackpackButton = AddButton("AdventureBackpacks_OpenBackpack", HotKeyOpen);
+            //Polled only from InventoryGui.Update, inside vanilla's own chat/console/menu gate (InventoryGui.cs:518),
+            //like vanilla's "Inventory" button, which ZInput does not gate on Player.TakeInput either.
+            OpenBackpackButton = AddButton("AdventureBackpacks_OpenBackpack", HotKeyOpen, activeInGui: true);
             DropBackpackButton = AddButton("AdventureBackpacks_QuickdropBackpack", HotKeyDrop);
         }
 
@@ -135,12 +137,14 @@ namespace AdventureBackpacks.Configuration
             watcher.EnableRaisingEvents = true;
         }
 
-        internal static ButtonConfig AddButton(string name, ConfigEntry<KeyCode> key)
+        internal static ButtonConfig AddButton(string name, ConfigEntry<KeyCode> key, bool activeInGui = false)
         {
             //AddButton appends the mod GUID to the name, so poll by ButtonConfig.Name.
             //Config (KeyCode), not ShortcutConfig: Jotunn binds it through ZInput.KeyCodeToPath, which is the
             //physical key. ShortcutConfig additionally gates on UnityEngine.Input, which follows the keyboard layout.
-            var button = new ButtonConfig { Name = name, Config = key };
+            //activeInGui: without it Jotunn answers GetButtonDown with Player.TakeInput(), which is false while
+            //InventoryGui is visible (Player.cs:2670), so a button polled from InventoryGui.Update never fires there.
+            var button = new ButtonConfig { Name = name, Config = key, ActiveInGUI = activeInGui };
             InputManager.Instance.AddButton(_modGuid, button);
             return button;
         }

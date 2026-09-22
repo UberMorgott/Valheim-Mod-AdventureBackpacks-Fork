@@ -277,7 +277,10 @@ internal static class InventoryGuiPatches
             player.QuickDropBackpack();
         }
 
-        if (hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value && !BackpackIsOpen && player.CanOpenBackpack() && !CheckForTextInput())
+        // Same radial/build-menu gate vanilla puts on the "Inventory" button (InventoryGui.cs:566), so the request
+        // is not latched in _showBackpack while vanilla refuses to show the inventory.
+        if (hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value && !BackpackIsOpen && player.CanOpenBackpack() && !CheckForTextInput()
+            && !Hud.InRadial() && !Hud.InBuildUi())
         {
             _showBackpack = true;
         }
