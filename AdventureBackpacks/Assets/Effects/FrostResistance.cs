@@ -1,4 +1,5 @@
-﻿using AdventureBackpacks.Extensions;
+﻿using System.Collections.Generic;
+using AdventureBackpacks.Extensions;
 using Jotunn.Entities;
 using UnityEngine;
 
@@ -20,6 +21,8 @@ public class FrostResistance : EffectsBase
             se.name = "SE_adventurebackpacks_frost_resistance";
             se.m_name = "$adventurebackpacks_se_frost_resistance";
             se.m_icon = freezing.m_icon;
+            // The effect must carry the resistance it names (SE_Stats.ModifyDamageMods applies m_mods).
+            se.m_mods = new List<HitData.DamageModPair> { EffectMod };
             _externalStatusEffect = se;
             // Fixed template: Jotunn adds it to every ObjectDB. Per-backpack effects are built at runtime instead.
             Jotunn.Managers.ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(se, fixReference: false));

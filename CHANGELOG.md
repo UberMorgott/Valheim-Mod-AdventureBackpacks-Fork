@@ -1,3 +1,7 @@
+## 1.9.14.6 - unreleased
+
+* A newly crafted backpack gives its status effect (carry bonus, speed, resistances) right away instead of only after
+  a relog. The frost resistance effect now carries the frost resistance it names. (port of upstream 2.0.10)
 ## 1.9.14.5 - Morgott's fork: support code rewritten as own implementation
 
 * The support library vendored in 1.9.14.4 is gone. Everything it did is now the fork's own code on top of Jotunn and

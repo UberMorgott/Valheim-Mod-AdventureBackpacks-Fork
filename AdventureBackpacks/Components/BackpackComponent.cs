@@ -167,6 +167,9 @@ namespace AdventureBackpacks.Components
                     _log.Debug($"[FirstLoad - {Item.m_shared.m_name}-Q{Item.m_quality}] Backpack null, creating...");
                     _backpackInventory = Backpacks.NewInventoryInstance(name, Item.m_quality);
                     Serialize();
+
+                    // A fresh backpack never passes through Deserialize, so build its equip status effect here too.
+                    Backpacks.UpdateStatusEffects(Item);
                 }
             }
         }
@@ -191,6 +194,9 @@ namespace AdventureBackpacks.Components
                 }
 
                 Serialize();
+
+                // No saved data to Deserialize (new or upgraded backpack): build the equip status effect here.
+                Backpacks.UpdateStatusEffects(Item);
             }
             IsLoadingInventory = false;
         }
