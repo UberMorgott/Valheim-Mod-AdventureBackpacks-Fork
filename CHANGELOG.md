@@ -5,6 +5,7 @@
 * Water and cold resistance only protect the player wearing the backpack. They used to switch rain and cold off for
   the whole world, so fires kept burning in the rain and buildings took no rain wear. Rain no longer wets the wearer,
   a Cold the wearer already had goes away without a message loop. (port of upstream 2.1.9/2.1.10)
+
 ## 1.9.14.5 - Morgott's fork: support code rewritten as own implementation
 
 * The support library vendored in 1.9.14.4 is gone. Everything it did is now the fork's own code on top of Jotunn and
