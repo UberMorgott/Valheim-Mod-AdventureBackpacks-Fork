@@ -1,7 +1,7 @@
 # Adventure Backpacks — Morgott's personal fork
 
 Fork of [AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) by **Vapok**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
-Plugin version **1.9.14.1**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+Plugin version **1.9.14.7**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
 equipped backpacks keep working.
 
 Credit where it is due:
@@ -12,8 +12,7 @@ Credit where it is due:
 
 Upstream material retains its MIT licence and unchanged `LICENSE.md` and `THIRD-PARTY-NOTICES.md`. Original contributions by Morgott are offered under CC BY-NC 4.0 within the scope of [CONTRIBUTOR-LICENSE.md](CONTRIBUTOR-LICENSE.md); prior MIT permissions remain valid.
 
-This fork is not published to Thunderstore. `manifest.json` still reports the upstream package version `1.9.13`
-because Thunderstore only accepts three-part versions; the runtime plugin version is `1.9.13.5`.
+This fork is not published to Thunderstore; `manifest.json` and the runtime plugin both report `1.9.14.7`.
 
 ---
 

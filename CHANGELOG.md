@@ -1,7 +1,9 @@
-## 1.9.14.7 - unreleased
+## 1.9.14.7 - Morgott's fork: backpack hotkey in inventory, door key world level
 
 * The backpack hotkey works while the inventory is open: it opens the backpack (or the backpack panel next to an open
   chest) and closes it again. It used to do nothing until the inventory was closed.
+* Doors check the world level of a key carried in the backpack, as vanilla does for keys in the inventory. A backpack
+  key of too low world level used to open the door. (port of upstream 2.1.13)
 
 ## 1.9.14.6 - Morgott's fork: backpack effects fixed, lighter textures
 
