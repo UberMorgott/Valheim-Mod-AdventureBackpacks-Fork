@@ -106,7 +106,9 @@ internal static class BackpackPanel
         if (gui.m_container == null || gui.m_containerGrid == null)
             return false;
 
-        _panel = UnityEngine.Object.Instantiate(gui.m_container.gameObject, gui.m_container.parent);
+        // Next to the crafting panel, under its parent (Inventory_screen/root): m_container itself sits under
+        // root/Player, where the crafting panel's anchors put the clone over the player grid.
+        _panel = UnityEngine.Object.Instantiate(gui.m_container.gameObject, gui.m_crafting.parent);
         _panel.name = "AB_BackpackPanel";
 
         _grid = _panel.GetComponentInChildren<InventoryGrid>(true);

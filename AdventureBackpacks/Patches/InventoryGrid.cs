@@ -53,7 +53,7 @@ internal static class ContainerPanelWidth
         var gui = InventoryGui.instance;
         if (gui == null || gui.m_container == null)
             return;
-        var panel = PanelOf(grid, gui.m_container);
+        var panel = PanelOf(grid, gui);
         var gridRect = grid.transform as RectTransform;
         // Only a grid that stretches with its panel follows a wider panel.
         if (panel == null || gridRect == null || Mathf.Approximately(gridRect.anchorMin.x, gridRect.anchorMax.x))
@@ -70,11 +70,12 @@ internal static class ContainerPanelWidth
             panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
     }
 
-    // The grid's ancestor that sits next to m_container: m_container itself or BackpackPanel's clone.
-    private static RectTransform PanelOf(InventoryGrid grid, RectTransform container)
+    // The grid's panel: m_container itself, or BackpackPanel's clone of it next to the crafting panel.
+    private static RectTransform PanelOf(InventoryGrid grid, InventoryGui gui)
     {
+        var crafting = gui.m_crafting != null ? gui.m_crafting.parent : null;
         for (var t = grid.transform; t != null; t = t.parent)
-            if (t.parent == container.parent)
+            if (t == gui.m_container || (crafting != null && t.parent == crafting))
                 return t as RectTransform;
         return null;
     }

@@ -3,6 +3,8 @@
 * A backpack configured wider than 8 columns no longer has its outer columns cut off: the container panel (and the
   backpack panel next to an open chest) widens by one slot per extra column, and a container that fits gets the
   normal width back.
+* The backpack panel next to an open chest sits where the crafting panel is, as intended; it used to cover the
+  player inventory.
 
 ## 1.9.14.7 - Morgott's fork: backpack hotkey in inventory, door key world level
 
