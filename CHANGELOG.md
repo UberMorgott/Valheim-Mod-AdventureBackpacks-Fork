@@ -5,6 +5,8 @@
   normal width back.
 * The backpack panel next to an open chest sits where the crafting panel is, as intended; it used to cover the
   player inventory.
+* Changing a backpack's size in game (Configuration Manager) no longer freezes the game when the backpack holds
+  items: the resize re-entered itself through the backpack weight update.
 
 ## 1.9.14.7 - Morgott's fork: backpack hotkey in inventory, door key world level
 

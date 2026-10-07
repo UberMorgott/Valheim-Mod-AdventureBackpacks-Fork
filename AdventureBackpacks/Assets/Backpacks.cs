@@ -167,6 +167,12 @@ namespace AdventureBackpacks.Assets
             AdventureBackpacks.Log.Debug($"[{currentBackpack.m_shared.m_name}]### Backpack Slot Size: {backpackSize}");
 
             var backpackItem = currentBackpack.GetOrCreateBackpackComponent();
+            // Already resizing this backpack: the MoveAll below raises Inventory.Changed -> UpdateTotalWeight ->
+            // this backpack's ItemData.GetWeight (ItemDropPatches), which lands here again while the component
+            // still holds the old inventory. Without this guard every nested call starts another MoveAll: unbounded
+            // recursion that froze the game when a backpack size changed in game (ConfigurationManager).
+            if (backpackItem.IsLoadingInventory)
+                return;
             var currentInventory = backpackItem.GetInventory();
             if (currentInventory == null)
             {
