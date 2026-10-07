@@ -1,3 +1,8 @@
+## 1.9.14.9 - Morgott's fork: backpack panel weight and tooltips on screen
+
+* The backpack panel next to an open chest shows its weight box at its left edge; at the right edge of the screen it
+  was cut in half. Item tooltips of that panel stay on screen.
+
 ## 1.9.14.8 - Morgott's fork: wide backpacks fit their panel
 
 * A backpack configured wider than 8 columns no longer has its outer columns cut off: the container panel (and the

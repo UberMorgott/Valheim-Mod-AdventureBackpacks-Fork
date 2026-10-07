@@ -161,7 +161,39 @@ internal static class BackpackPanel
         rect.anchorMax = crafting.anchorMax;
         rect.pivot = crafting.pivot;
         rect.anchoredPosition = crafting.anchoredPosition;
+
+        // The container panel's weight box hangs outside its right edge (prefab Container/Weight: anchor x 1, centre
+        // +34 px), the free side next to vanilla's left-hand container. At the crafting panel's place the right edge
+        // is the screen's, so the box was cut in half: it goes to the same place outside the left edge, towards the
+        // player panels. Item tooltips are parented to the grid's m_tooltipAnchor (InventoryGrid.CreateItemTooltip,
+        // InventoryGrid.cs:411; UITooltip.AnchorTooltip, UITooltip.cs:101-105), which also sits right of the panel
+        // (Container/TooltipAnchor, +90 px) and put them off screen; without an anchor UITooltip places the tooltip
+        // over the hovered slot and clamps it to the screen (UITooltip.cs:112-116), as for the other grids.
+        var weight = DirectChild(TwinOf(gui, AccessTools.Field(typeof(InventoryGui), "m_containerWeight")?.GetValue(gui) as Component));
+        if (weight != null)
+            MirrorX(weight);
+        _grid.m_tooltipAnchor = null;
         return true;
+    }
+
+    // The ancestor of a panel element that is a direct child of the panel.
+    private static RectTransform DirectChild(Component element)
+    {
+        for (var t = element == null ? null : element.transform; t != null; t = t.parent)
+            if (t.parent == _panel.transform)
+                return t as RectTransform;
+        return null;
+    }
+
+    // Mirror a child's place about the panel's vertical centre line (anchors, pivot, offset).
+    private static void MirrorX(RectTransform rect)
+    {
+        var min = rect.anchorMin;
+        var max = rect.anchorMax;
+        rect.anchorMin = new Vector2(1f - max.x, min.y);
+        rect.anchorMax = new Vector2(1f - min.x, max.y);
+        rect.pivot = new Vector2(1f - rect.pivot.x, rect.pivot.y);
+        rect.anchoredPosition = new Vector2(-rect.anchoredPosition.x, rect.anchoredPosition.y);
     }
 
     private static void WireButton(Button button, UnityEngine.Events.UnityAction action)
