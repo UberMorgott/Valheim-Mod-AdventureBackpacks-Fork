@@ -150,8 +150,9 @@ internal static class BackpackPanel
         _nameText = TextOfTwin(gui, "m_containerName");
         _weightText = TextOfTwin(gui, "m_containerWeight");
 
-        // Sit where the crafting panel sits (which is why the crafting panel gets hidden).
-        // ponytail: position only, no size fitting — tweak here if the panel ever overlaps.
+        // Sit where the crafting panel sits (which is why the crafting panel gets hidden). Its pivot is the
+        // crafting panel's top-right corner, so a backpack wider than 8 columns widens it to the left
+        // (ContainerPanelWidth, Patches\InventoryGrid.cs).
         var rect = (RectTransform)_panel.transform;
         var crafting = gui.m_crafting;
         rect.anchorMin = crafting.anchorMin;

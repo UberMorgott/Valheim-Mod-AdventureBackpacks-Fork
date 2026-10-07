@@ -1,3 +1,9 @@
+## 1.9.14.8 - Morgott's fork: wide backpacks fit their panel
+
+* A backpack configured wider than 8 columns no longer has its outer columns cut off: the container panel (and the
+  backpack panel next to an open chest) widens by one slot per extra column, and a container that fits gets the
+  normal width back.
+
 ## 1.9.14.7 - Morgott's fork: backpack hotkey in inventory, door key world level
 
 * The backpack hotkey works while the inventory is open: it opens the backpack (or the backpack panel next to an open
