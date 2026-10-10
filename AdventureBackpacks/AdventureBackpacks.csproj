@@ -12,6 +12,10 @@
         <!-- Jotunn resolves VALHEIM_INSTALL (Steam registry, or an untracked Environment.props / env var)
              and publicizes the game assemblies it references from there before each build. -->
         <ExecutePrebuild>true</ExecutePrebuild>
+        <!-- SDK 8's in-box SourceLink embeds the git commit SHA in the PDB, which the deterministic
+             content id folds into the MVID/PE timestamp: every commit changed the DLL bytes. -->
+        <EnableSourceLink>false</EnableSourceLink>
+        <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
