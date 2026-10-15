@@ -1,3 +1,5 @@
+## 1.9.14.10 - Morgott's fork: reproducible build (SourceLink off), no code change
+
 ## 1.9.14.9 - Morgott's fork: backpack panel weight and tooltips on screen
 
 * The backpack panel next to an open chest shows its weight box at its left edge; at the right edge of the screen it
