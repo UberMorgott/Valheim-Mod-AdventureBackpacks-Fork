@@ -44,7 +44,12 @@ public static class QuickTransfer
             if (Player.m_localPlayer == null || __instance == null || item == null)
                 return;
 
-            if (__instance.m_currentContainer == null || !__instance.IsContainerOpen() || !EnableQuickTransfer.Value)
+            if (!EnableQuickTransfer.Value)
+                return;
+
+            // A chest or the backpack panel (which takes the container's role without a chest) must be open.
+            var containerOpen = __instance.m_currentContainer != null;
+            if (!containerOpen && !BackpackPanel.IsOpen)
                 return;
 
             if (Chainloader.PluginInfos.ContainsKey("blumaye.quicktransfer"))
@@ -96,6 +101,26 @@ public static class QuickTransfer
                 }
             }
 
+            if (grid == null)
+                return;
+
+            // Same target rules as shift-move while the backpack panel is open.
+            if (BackpackPanel.TryRoute(__instance, grid.m_inventory, item, out var routed))
+            {
+                // No target: the item must not move (a backpack into a backpack); vanilla right click goes on.
+                if (routed == null || routed == grid.m_inventory)
+                    return;
+
+                _inventoryGuiInstance = __instance;
+                _fromInventory = grid.m_inventory;
+                _toInventory = routed;
+                _processingRightClick = true;
+                return;
+            }
+
+            if (!containerOpen)
+                return;
+
             var containerInventory = __instance.m_currentContainer.GetInventory();
 
             if (item.IsBackpack() && containerInventory.IsBackPackInventory())
@@ -103,18 +128,12 @@ public static class QuickTransfer
 
             var playerInventory = Player.m_localPlayer.GetInventory();
 
-            if (playerInventory == null || containerInventory == null || grid == null)
+            if (playerInventory == null || containerInventory == null)
                 return;
 
             _inventoryGuiInstance = __instance;
 
-            // Same target rules as shift-move while the extra backpack panel is open.
-            if (BackpackPanel.TryRoute(__instance, grid.m_inventory, item, out var routed))
-            {
-                _fromInventory = grid.m_inventory;
-                _toInventory = routed;
-            }
-            else if (grid.m_inventory == containerInventory)
+            if (grid.m_inventory == containerInventory)
             {
                 _fromInventory = containerInventory;
                 _toInventory = playerInventory;

@@ -52,18 +52,27 @@ public static class PlayerExtensions
         return IsBackpackEquipped(player);
     }
 
+    /// <summary>
+    /// Shows the equipped backpack in its own panel, opening the inventory first when it is closed. The backpack is
+    /// never shown through vanilla's container panel (m_currentContainer stays a real container or null).
+    /// </summary>
     public static void OpenBackpack(this Player player, InventoryGui instance)
     {
-        if (player == null)
+        if (player == null || instance == null)
             return;
 
         var backpackContainer = player.gameObject.GetComponent<Container>();
 
         var backpack = player.GetEquippedBackpack();
-        backpack?.UpdateContainerSizing(ref backpackContainer);
+        if (backpack == null)
+            return;
+        backpack.UpdateContainerSizing(ref backpackContainer);
 
-        InventoryGuiPatches.BackpackIsOpen = true;
-        instance.Show(backpackContainer);
+        // InventoryGui.Show(null) is what the inventory key does (InventoryGui.cs:571); calling it while shown would
+        // drop an open chest (m_currentContainer = container, InventoryGui.cs:1044).
+        if (!instance.m_animator.GetBool("visible"))
+            instance.Show(null);
+        BackpackPanel.Open(player, instance);
     }
 
     public static void QuickDropBackpack(this Player player)
@@ -126,7 +135,6 @@ public static class PlayerExtensions
         if (swapItemActivated)
             playerInventory.AddItem(tempItemRemoval);
 
-        InventoryGuiPatches.BackpackIsOpen = false;
         AdventureBackpacks.QuickDropping = false;
     }
 }

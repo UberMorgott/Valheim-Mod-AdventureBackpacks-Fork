@@ -72,16 +72,16 @@ public class HumanoidPatches
 
                 var inventoryGui = InventoryGui.instance;
 
-                // Close the backpack inventory if it's currently open
-                if (inventoryGui != null && inventoryGui.IsContainerOpen())
-                {
-                    inventoryGui.CloseContainer();
-                    InventoryGuiPatches.BackpackIsOpen = false;
-                }
-
                 var backpackContainer = player.gameObject.GetComponent<Container>();
                 if (backpackContainer == null)
                     return;
+
+                // The backpack panel closes itself in its InventoryGui.Update postfix once no backpack is equipped
+                // (cancelling a drag from it then, not in the middle of InventoryGui.OnSelectedItem, which unequips
+                // before it drops the dragged item, InventoryGui.cs:897-901). A real chest stays open; only a mod that
+                // showed the backpack through the player's own Container in the container panel gets it closed.
+                if (inventoryGui != null && inventoryGui.m_currentContainer == backpackContainer)
+                    inventoryGui.CloseContainer();
 
                 backpackContainer.m_inventory = new Inventory("Empty", null, 1, 1);
                 InventoryGuiPatches.BackpackEquipped = false;

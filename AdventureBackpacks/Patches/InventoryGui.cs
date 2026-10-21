@@ -15,7 +15,6 @@ namespace AdventureBackpacks.Patches;
 
 internal static class InventoryGuiPatches
 {
-    public static bool BackpackIsOpen;
     public static bool BackpackEquipped = false;
     private static bool _showBackpack;
 
@@ -81,7 +80,6 @@ internal static class InventoryGuiPatches
                         && Backpacks.BackpackTypes.Contains(item.m_shared.m_name))
                     {
                         Player.m_localPlayer.DropItem(Player.m_localPlayer.GetInventory(), item, 1);
-                        BackpackIsOpen = false;
                         __instance.Hide();
                         Player.m_localPlayer.Message(MessageHud.MessageType.TopLeft, "$adventurebackpacks_you_dropped_bag");
 
@@ -113,158 +111,89 @@ internal static class InventoryGuiPatches
         return TextInput.IsVisible();
     }
 
+    // Called right after vanilla InventoryGui.Show(null) from the inventory key (InventoryGui.cs:571). The backpack
+    // panel itself opens with the inventory (BackpackPanel's Update postfix, "Open with Inventory"); this only serves
+    // an explicit backpack-hotkey request.
     public static void ShowBackpack(Player player, InventoryGui instance)
     {
-        if (ConfigRegistry.OpenWithInventory.Value && !BackpackIsOpen && player.CanOpenBackpack())
-        {
-            _showBackpack = true;
-        }
+        if (!_showBackpack)
+            return;
 
-        if (_showBackpack)
-        {
-            if (!BackpackIsOpen && instance.m_currentContainer != null)
-            {
-                instance.m_currentContainer.SetInUse(false);
-                instance.m_currentContainer = null;
-            }
-
-            _showBackpack = false;
-            player.OpenBackpack(instance);
-        }
+        _showBackpack = false;
+        BackpackPanel.Open(player, instance);
     }
 
+    // Called right before vanilla Hide() from the close keys (InventoryGui.cs:556-560).
     public static void HideBackpack(InventoryGui instance)
     {
-        if (BackpackIsOpen)
-        {
-            instance.CloseContainer();
-            BackpackIsOpen = false;
-
-            if (ConfigRegistry.CloseInventory.Value && !ConfigRegistry.OpenWithHoverInteract.Value)
-                instance.Hide();
-        }
+        BackpackPanel.Close(instance);
     }
 
-    public static bool DetectInputToHide(Player player, InventoryGui instance)
+    private static bool HoveringEquippedBackpack(InventoryGui instance)
     {
-        var hotKeyDown = ZInput.GetButtonDown(ConfigRegistry.OpenBackpackButton.Name);
-        var hotKeyDownOnClose = ConfigRegistry.CloseInventory.Value && hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value;
-        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetButtonDown(ConfigRegistry.DropBackpackButton.Name);
+        var grids = instance.m_player.GetComponentsInChildren<InventoryGrid>();
+        ItemDrop.ItemData hoveredItem = null;
 
-        var openBackpack = hotKeyDown && !BackpackIsOpen && player.CanOpenBackpack() && !ConfigRegistry.OpenWithHoverInteract.Value;
-
-        var grids = new List<InventoryGrid>();
-        grids.AddRange(instance.m_player.GetComponentsInChildren<InventoryGrid>());
-
-        if (hotKeyDown && !BackpackIsOpen && ConfigRegistry.OpenWithHoverInteract.Value && !CheckForTextInput())
+        foreach (var grid in grids)
         {
-            ItemDrop.ItemData hoveredItem = null;
+            var hoveredElement = grid.GetHoveredElement();
+            if (hoveredElement == null)
+                continue;
 
+            hoveredItem = grid.GetInventory().GetItemAt(hoveredElement.Position.x, hoveredElement.Position.y);
+        }
+
+        if (ZInput.IsGamepadActive() && hoveredItem == null)
+        {
             foreach (var grid in grids)
             {
-                if (grid.GetHoveredElement() == null)
+                if (grid.GetGamepadSelectedItem() == null)
                     continue;
-
-                var hoveredElement = grid.GetHoveredElement();
-                hoveredItem = grid.GetInventory().GetItemAt(hoveredElement.Position.x, hoveredElement.Position.y);
-            }
-
-            if (ZInput.IsGamepadActive() && hoveredItem == null)
-            {
-                foreach (var grid in grids)
-                {
-                    if (grid.GetGamepadSelectedItem() == null)
-                        continue;
-                    hoveredItem = grid.GetGamepadSelectedItem();
-                }
-            }
-
-            if (hoveredItem != null && hoveredItem.IsBackpack() && hoveredItem.m_equipped && !BackpackIsOpen &&
-                player.CanOpenBackpack())
-            {
-                openBackpack = true;
+                hoveredItem = grid.GetGamepadSelectedItem();
             }
         }
 
-        // Hotkey while the extra backpack panel is up closes only that panel, the chest stays open.
-        if (hotKeyDown && BackpackPanel.IsOpen && !CheckForTextInput())
-        {
-            BackpackPanel.Close(instance);
+        return hoveredItem != null && hoveredItem.IsBackpack() && hoveredItem.m_equipped;
+    }
+
+    // Backpack hotkey while the inventory is open. Returns true when the whole inventory must close (vanilla Hide).
+    public static bool DetectInputToHide(Player player, InventoryGui instance)
+    {
+        if (CheckForTextInput())
             return false;
-        }
 
-        if (openBackpack & !CheckForTextInput())
-        {
-            // A real container is open (not the player's own backpack container): show the backpack as a
-            // third panel next to it instead of replacing it.
-            // The mod's own backpack container is the Container component on the player object
-            // (PlayerExtensions.OpenBackpack); anything else is a real container in the world.
-            if (instance.m_currentContainer != null && instance.m_currentContainer != player.gameObject.GetComponent<Container>())
-            {
-                BackpackPanel.Open(player, instance);
-                return false;
-            }
+        var hotKeyDown = ZInput.GetButtonDown(ConfigRegistry.OpenBackpackButton.Name);
+        var hotKeyDrop = ConfigRegistry.OutwardMode.Value && ZInput.GetButtonDown(ConfigRegistry.DropBackpackButton.Name);
 
-            if (instance.m_currentContainer != null)
-            {
-                instance.m_currentContainer.SetInUse(false);
-                instance.m_currentContainer = null;
-            }
-            player.OpenBackpack(instance);
-            return false;
-        }
-
-        if (hotKeyDown && BackpackIsOpen && (!hotKeyDownOnClose || ConfigRegistry.OpenWithHoverInteract.Value) && !CheckForTextInput())
-        {
-            bool closeBackpack = false;
-
-            if (ConfigRegistry.OpenWithHoverInteract.Value)
-            {
-                ItemDrop.ItemData hoveredItem = null;
-
-                foreach (var grid in grids)
-                {
-                    if (grid.GetHoveredElement() == null)
-                        continue;
-
-                    var hoveredElement = grid.GetHoveredElement();
-                    hoveredItem = grid.GetInventory().GetItemAt(hoveredElement.Position.x, hoveredElement.Position.y);
-                }
-
-                if (ZInput.IsGamepadActive() && hoveredItem == null)
-                {
-                    foreach (var grid in grids)
-                    {
-                        if (grid.GetGamepadSelectedItem() == null)
-                            continue;
-                        hoveredItem = grid.GetGamepadSelectedItem();
-                    }
-                }
-
-                if (hoveredItem != null && hoveredItem.IsBackpack() && hoveredItem.m_equipped && BackpackIsOpen)
-                {
-                    closeBackpack = true;
-                }
-            }
-            else
-            {
-                closeBackpack = true;
-            }
-
-            if (closeBackpack)
-            {
-                instance.CloseContainer();
-                BackpackIsOpen = false;
-                return false;
-            }
-        }
-
-        if (hotKeyDrop && !CheckForTextInput())
-        {
+        if (hotKeyDrop)
             player.QuickDropBackpack();
+
+        if (!hotKeyDown)
+            return hotKeyDrop;
+
+        if (ConfigRegistry.OpenWithHoverInteract.Value)
+        {
+            // Hover mode: the hotkey over the equipped backpack toggles its panel.
+            if (HoveringEquippedBackpack(instance))
+                TogglePanel(player, instance);
+            return hotKeyDrop;
         }
 
-        return ((hotKeyDownOnClose) || hotKeyDrop) && !CheckForTextInput();
+        // Without a chest, "Close Inventory" makes the hotkey close the whole inventory when the panel is up; with a
+        // chest open it only toggles the backpack panel, the chest stays open.
+        if (BackpackPanel.IsOpen && ConfigRegistry.CloseInventory.Value && !instance.IsContainerOpen())
+            return true;
+
+        TogglePanel(player, instance);
+        return hotKeyDrop;
+    }
+
+    private static void TogglePanel(Player player, InventoryGui instance)
+    {
+        if (BackpackPanel.IsOpen)
+            BackpackPanel.Close(instance, byUser: true);
+        else if (player.CanOpenBackpack())
+            BackpackPanel.Open(player, instance);
     }
 
     public static bool DetectInputToShow(Player player, InventoryGui instance)
@@ -279,7 +208,7 @@ internal static class InventoryGuiPatches
 
         // Same radial/build-menu gate vanilla puts on the "Inventory" button (InventoryGui.cs:566), so the request
         // is not latched in _showBackpack while vanilla refuses to show the inventory.
-        if (hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value && !BackpackIsOpen && player.CanOpenBackpack() && !CheckForTextInput()
+        if (hotKeyDown && !ConfigRegistry.OpenWithHoverInteract.Value && player.CanOpenBackpack() && !CheckForTextInput()
             && !Hud.InRadial() && !Hud.InBuildUi())
         {
             _showBackpack = true;

@@ -1,7 +1,7 @@
 # Adventure Backpacks — Morgott's personal fork
 
 Fork of [AdventureBackpacks](https://github.com/Vapok/AdventureBackpacks) by **Vapok**, maintained by **Morgott** ([UberMorgott](https://github.com/UberMorgott)).
-Plugin version **1.9.14.10**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
+Plugin version **1.9.15.0**, plugin GUID unchanged: `vapok.mods.adventurebackpacks`, so existing configs and
 equipped backpacks keep working.
 
 Credit where it is due:
@@ -12,7 +12,7 @@ Credit where it is due:
 
 Upstream material retains its MIT licence and unchanged `LICENSE.md` and `THIRD-PARTY-NOTICES.md`. Original contributions by Morgott are offered under CC BY-NC 4.0 within the scope of [CONTRIBUTOR-LICENSE.md](CONTRIBUTOR-LICENSE.md); prior MIT permissions remain valid.
 
-This fork is not published to Thunderstore; `manifest.json` and the runtime plugin both report `1.9.14.10`.
+This fork is not published to Thunderstore; `manifest.json` and the runtime plugin both report `1.9.15.0`.
 
 ---
 
@@ -26,6 +26,23 @@ This fork is not published to Thunderstore; `manifest.json` and the runtime plug
 | **Patch hygiene** | `EnvMan.IsCold`, `EnvMan.IsWet`, `ItemDrop.ItemData.GetIcon` and `ItemDrop.ItemData.GetWeight` are postfixes rather than skipping prefixes or transpilers. The remaining transpilers are anchored with `CodeMatcher` on real method calls and log an explicit error when the anchor is gone. |
 | **Cheaper hot path** | The `SEMan.RemoveStatusEffect` prefix returns early for anything that is not the local player's `SEMan`. |
 | **EquipmentAndQuickSlots** | No dedicated slot: a backpack is a vanilla `ItemType.Shoulder` item, so with EQS installed it goes into the EQS `Shoulder` slot (cape or backpack on your back). |
+| **Backpack panel** | The worn backpack has its own panel in the inventory screen, with or without a chest; chest, backpack and inventory are usable together. Placed in free space next to the vanilla panels (crafting panel hidden only when a chest is open and nothing is free). Reachable by gamepad group cycling. |
+
+### Backpack panel API (`AdventureBackpacks.API.ABAPI`)
+
+For layout owners (RuneSkin docking) and gameplay modules (e.g. inventory sorting). All members are main-thread only.
+
+| Member | Meaning |
+| ------ | ------- |
+| `RectTransform GetBackpackPanel()` | Panel root; null until first opened. |
+| `InventoryGrid GetBackpackGrid()` | The panel's grid (clone of the container grid, same InventoryGui handlers, own gamepad group). |
+| `Inventory GetBackpackPanelInventory()` | Backpack inventory currently shown; null while closed. Changes are persisted by Adventure Backpacks (`Inventory.Changed`). |
+| `bool IsBackpackPanelOpen()` | Whether the panel is shown. |
+| `event Action<RectTransform> BackpackPanelCreated` | Raised once when the panel is created; late subscribers are called at once. |
+
+Docking: when `RuneSkin.API.Skin.Supports("panel.dock")` is true (checked by reflection, RuneSkin is optional),
+Adventure Backpacks never positions the panel and never hides the crafting panel; the layout owner registers and
+places it.
 
 ---
 

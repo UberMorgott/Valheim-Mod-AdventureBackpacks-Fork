@@ -70,7 +70,7 @@ internal static class ContainerPanelWidth
             panel.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
     }
 
-    // The grid's panel: m_container itself, or BackpackPanel's clone of it next to the crafting panel.
+    // The grid's panel: m_container itself, or BackpackPanel's clone of it (a sibling of the crafting panel).
     private static RectTransform PanelOf(InventoryGrid grid, InventoryGui gui)
     {
         var crafting = gui.m_crafting != null ? gui.m_crafting.parent : null;

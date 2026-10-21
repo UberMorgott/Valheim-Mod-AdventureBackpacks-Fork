@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using UnityEngine;
 #if ! API
 using AdventureBackpacks.Assets.Factories;
 using AdventureBackpacks.Extensions;
 using AdventureBackpacks.Features;
+using AdventureBackpacks.Patches;
 #endif
 
 namespace AdventureBackpacks.API;
@@ -142,7 +145,9 @@ return null;
     }
 
     /// <summary>
-    /// Method to activate the backpack on the local player's GUI and open it. Use in conjunction with CanOpenBackpack()
+    /// Method to activate the backpack on the local player's GUI and open it. Use in conjunction with CanOpenBackpack().
+    /// Opens the inventory when it is closed and shows the backpack in its own panel (see GetBackpackPanel); an open
+    /// chest stays open.
     /// </summary>
     /// <param name="player">Player, usually Player.m_localPlayer</param>
     /// <param name="gui">The instance of InventoryGui</param>
@@ -151,6 +156,78 @@ return null;
 #if ! API
         if (player != null)
             player.OpenBackpack(gui);
+#endif
+    }
+
+    /// <summary>
+    /// Root RectTransform of the backpack panel: the equipped backpack's grid in the inventory screen, shown whenever
+    /// the inventory is open and a backpack is worn (with or without a chest). Null until the panel was first opened;
+    /// use BackpackPanelCreated to get it as soon as it exists. A layout owner that docks it (RuneSkin
+    /// Supports("panel.dock")) positions it; Adventure Backpacks then never moves it nor hides the crafting panel.
+    /// </summary>
+    /// <returns>The panel root, or null.</returns>
+    public static RectTransform GetBackpackPanel()
+    {
+#if ! API
+        return BackpackPanel.Root;
+#else
+        return null;
+#endif
+    }
+
+    /// <summary>
+    /// The backpack panel's InventoryGrid (a clone of the vanilla container grid, wired to the same InventoryGui
+    /// handlers and gamepad group cycling). Null until the panel was first opened.
+    /// </summary>
+    /// <returns>The panel grid, or null.</returns>
+    public static InventoryGrid GetBackpackGrid()
+    {
+#if ! API
+        return BackpackPanel.Grid;
+#else
+        return null;
+#endif
+    }
+
+    /// <summary>
+    /// The backpack inventory the panel currently shows, null while the panel is closed. Changes made to it are saved
+    /// into the backpack item by Adventure Backpacks (Inventory.Changed), so sorters can work on it directly.
+    /// </summary>
+    /// <returns>The shown backpack inventory, or null.</returns>
+    public static Inventory GetBackpackPanelInventory()
+    {
+#if ! API
+        return BackpackPanel.ShownInventory;
+#else
+        return null;
+#endif
+    }
+
+    /// <summary>
+    /// Whether the backpack panel is currently shown.
+    /// </summary>
+    /// <returns>true or false</returns>
+    public static bool IsBackpackPanelOpen()
+    {
+#if ! API
+        return BackpackPanel.IsOpen;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// Raised once, on the Unity main thread, when the backpack panel is created (the first time it opens). A handler
+    /// added after that is called at once with the existing panel, so subscribing late never misses it.
+    /// </summary>
+    public static event Action<RectTransform> BackpackPanelCreated
+    {
+#if ! API
+        add => BackpackPanel.Created += value;
+        remove => BackpackPanel.Created -= value;
+#else
+        add { }
+        remove { }
 #endif
     }
 

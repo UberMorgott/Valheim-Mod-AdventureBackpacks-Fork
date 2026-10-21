@@ -1,3 +1,21 @@
+## 1.9.15.0 - Morgott's fork: backpack panel always available, gamepad, docking API
+
+* The backpack has its own panel whenever the inventory is open and a backpack is worn, with or without a chest
+  ("Open with Inventory"; the hotkey toggles it). With a chest open, chest, backpack and inventory are all usable.
+  The backpack is no longer shown in the chest panel, so it is never shown twice. Unequipping it or closing the
+  inventory closes the panel and cancels a drag from it.
+* Shift-move and right-click quick transfer: backpack <-> inventory without a chest; backpack -> chest,
+  chest -> inventory (overflow into the backpack) with one. Dragging from the backpack works without a chest.
+* The panel no longer hides the crafting panel: it is placed in free space next to the vanilla panels. Only when a
+  chest is open and nothing is free does it take the crafting panel's place (hiding it) as before.
+* Gamepad: the panel is a regular inventory group (LB/RB), with selection, take all/stack all hints, transfer and
+  the drag icon.
+* API: GetBackpackPanel, GetBackpackGrid, GetBackpackPanelInventory, IsBackpackPanelOpen, event BackpackPanelCreated.
+  A layout owner that docks the panel (RuneSkin "panel.dock") positions it; Adventure Backpacks then leaves it alone.
+* Unequipping the backpack no longer closes an open chest.
+
+## 1.9.14.11 - Morgott's fork: version bump, no code change
+
 ## 1.9.14.10 - Morgott's fork: reproducible build (SourceLink off), no code change
 
 ## 1.9.14.9 - Morgott's fork: backpack panel weight and tooltips on screen
