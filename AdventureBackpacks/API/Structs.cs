@@ -5,6 +5,21 @@ using UnityEngine;
 namespace AdventureBackpacks.API;
 
 /// <summary>
+/// Defines the visual model geometry style for a backpack.
+/// </summary>
+public enum ModelStyle
+{
+    /// <summary>
+    /// Modern style with detailed models and accessories.
+    /// </summary>
+    Modern = 0,
+    /// <summary>
+    /// Classic original backpack model.
+    /// </summary>
+    Classic = 1
+}
+
+/// <summary>
 /// This is a Flags enum for determining Backpack Biomes. This is not representative of Heightmap.Biomes.
 /// This is instead a way of creating sets of Effects. Default Adventure Backpacks will utilize Biome names.
 /// Custom External Effects can pick and choose between the Custom Effect flags as well.
@@ -192,10 +207,20 @@ public partial class ABAPI
         /// </summary>
         public int CarryBonus;
         /// <summary>
+        /// Provides the configured armor per quality level applied to the backpack.
+        /// For registering a new backpack, this is the default value.
+        /// </summary>
+        public int ArmorPerLevel = 1;
+        /// <summary>
         /// Provides the Speed Modification that is applied on the backpack.
         /// For registering a new backpack, this is the default value.
         /// </summary>
         public float SpeedMod;
+        /// <summary>
+        /// Provides whether the movement speed penalty scales down with backpack quality level.
+        /// For registering a new backpack, this is the default value.
+        /// </summary>
+        public bool ScaleSpeedModByQuality = true;
         /// <summary>
         /// Provides whether the wearer of the backpack will freeze or not.
         /// </summary>

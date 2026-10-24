@@ -78,6 +78,11 @@ internal abstract class AssetItem : IAssetItem
         _recipe.AddUpgradeCost(prefabName, quantity);
     }
 
+    internal void AddUpgraderIngredient(string prefabName, int quantity = 1)
+    {
+        _recipe.AddUpgraderCost(prefabName, quantity);
+    }
+
     internal ItemDrop GetItemDrop()
     {
         return _prefab.GetComponent<ItemDrop>();
@@ -96,6 +101,7 @@ internal abstract class AssetItem : IAssetItem
         _prefab.GetComponent<ZNetView>().m_persistent = true;
     }
 
+    // m_armor is the level-1 value; vanilla adds m_armorPerLevel for every level above 1 (ItemDrop.cs GetArmor).
     internal void ResetPrefabArmor()
     {
         var itemDrop = GetItemDrop();
@@ -103,7 +109,9 @@ internal abstract class AssetItem : IAssetItem
         if (itemData != null)
         {
             itemDrop.m_autoPickup = true;
-            itemData.m_shared.m_armor = itemData.m_shared.m_armorPerLevel;
+            var armorPerLevel = this is BackpackItem { ArmorPerLevel: not null } backpack ? backpack.ArmorPerLevel.Value : itemData.m_shared.m_armorPerLevel;
+            itemData.m_shared.m_armorPerLevel = armorPerLevel;
+            itemData.m_shared.m_armor = armorPerLevel;
             itemDrop.Save();
         }
     }

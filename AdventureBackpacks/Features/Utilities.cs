@@ -6,7 +6,7 @@ namespace AdventureBackpacks.Features;
 
 public static class Utilities
 {
-    const string EmbeddedFolder = "Assets.Bundles";
+    internal const string EmbeddedFolder = "Assets.Bundles";
 
     // Bundles this mod loaded. Several backpacks share one bundle (adventurebackpacks); Unity refuses to load
     // the same bundle twice, so each is loaded once and reused.

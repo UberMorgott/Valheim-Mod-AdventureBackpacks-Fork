@@ -21,6 +21,7 @@ internal class BackpackSwamp : BackpackItem
 
         AddUpgradeIngredient("Bloodbag", 2);
         AddUpgradeIngredient("Iron", 5);
+        AddUpgraderIngredient("Upgrader2Armor", 1);
 
         Recipe.AddDrop("Draugr", 0.002f, 1);
         Recipe.AddDrop("Draugr_Ranged", 0.004f, 1);
@@ -39,6 +40,7 @@ internal class BackpackSwamp : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(15);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.Swamp) != BackpackBiomes.None)
         {
@@ -49,7 +51,7 @@ internal class BackpackSwamp : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }

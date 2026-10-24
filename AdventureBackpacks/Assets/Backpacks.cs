@@ -268,7 +268,15 @@ namespace AdventureBackpacks.Assets
         /// </summary>
         public static bool PerformYardSale(Player mLocalPlayer, ItemDrop.ItemData itemData, bool backpackOnly = false, int numberItems = 0)
         {
-            if (!itemData.IsBackpack())
+            if (mLocalPlayer == null || itemData == null || !itemData.IsBackpack())
+                return true;
+
+            // Dying moves the whole inventory into the tombstone; looting the tombstone moves it back.
+            // Both keep the backpack's contents with it.
+            if (mLocalPlayer.IsDead())
+                return true;
+
+            if (InventoryGui.instance != null && InventoryGui.instance.m_currentContainer != null && InventoryGui.instance.m_currentContainer.GetComponent<TombStone>() != null)
                 return true;
 
             var backpack = itemData.GetBackpackComponent();
@@ -348,6 +356,7 @@ namespace AdventureBackpacks.Assets
 
             var inventory = backpack.GetInventory();
             EmptyInventory(inventory);
+            backpack.Save();
 
             if (dropWasBlocked)
             {
@@ -408,8 +417,10 @@ namespace AdventureBackpacks.Assets
             }
 
             var modifierList = new List<HitData.DamageModPair>();
-            //Set Armor Default
-            itemData.m_shared.m_armor = itemData.m_shared.m_armorPerLevel * backpackQuality;
+            //Level-1 armor; vanilla adds m_armorPerLevel for each level above 1 (ItemDrop.ItemData.GetArmor).
+            var armorPerLevel = backpack.ArmorPerLevel?.Value ?? itemData.m_shared.m_armorPerLevel;
+            itemData.m_shared.m_armorPerLevel = armorPerLevel;
+            itemData.m_shared.m_armor = armorPerLevel;
 
             //Apply Frost Resistance if configured.
             var frostResistEffect = EffectsFactory.EffectList[BackpackEffect.FrostResistance];

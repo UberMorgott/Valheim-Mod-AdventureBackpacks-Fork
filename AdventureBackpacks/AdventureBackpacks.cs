@@ -31,14 +31,25 @@ namespace AdventureBackpacks
         //Module Constants
         private const string _pluginId = "vapok.mods.adventurebackpacks";
         private const string _displayName = "Adventure Backpacks";
-        private const string _version = "1.9.15.0";
+        private const string _version = "1.10.0.0";
 
 
         //Class Properties
         public static ModLogger Log => _log;
         public static bool PerformYardSale = false;
         public static bool QuickDropping = false;
-        public static bool BypassMoveProtection = false;
+        // Nested callers (TakeAll inside OnTakeAll, MoveAll inside OnDeath) each push and pop, so the
+        // inner one finishing does not switch the protection back on for the outer one.
+        private static int _bypassMoveProtectionDepth;
+        public static bool BypassMoveProtection => _bypassMoveProtectionDepth > 0;
+
+        public static void PushBypassMoveProtection() => _bypassMoveProtectionDepth++;
+
+        public static void PopBypassMoveProtection()
+        {
+            if (_bypassMoveProtectionDepth > 0)
+                _bypassMoveProtectionDepth--;
+        }
         public static Waiting Waiter;
         public static ConfigRegistry ActiveConfig => _config;
 

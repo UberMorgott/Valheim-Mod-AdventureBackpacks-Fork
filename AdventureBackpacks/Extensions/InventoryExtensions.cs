@@ -82,4 +82,34 @@ public static class InventoryExtensions
 
         return GetNonBackpackItem(inventory.m_width - 1, inventory.m_height - 1);
     }
+
+    public static bool SafeHaveItem(this Inventory inventory, string name)
+    {
+        if (inventory?.m_inventory == null || string.IsNullOrEmpty(name))
+            return false;
+
+        foreach (var item in inventory.m_inventory)
+        {
+            if (item?.m_shared != null && item.m_shared.m_name == name)
+                return true;
+        }
+
+        return false;
+    }
+
+    // Inventory.FindFreeStackSpace without its null dereferences on foreign items.
+    public static int SafeFindFreeStackSpace(this Inventory inventory, string name, float worldLevel)
+    {
+        if (inventory?.m_inventory == null || string.IsNullOrEmpty(name))
+            return 0;
+
+        var free = 0;
+        foreach (var item in inventory.m_inventory)
+        {
+            if (item?.m_shared != null && item.m_shared.m_name == name && item.m_stack < item.m_shared.m_maxStackSize && item.m_worldLevel == worldLevel)
+                free += item.m_shared.m_maxStackSize - item.m_stack;
+        }
+
+        return free;
+    }
 }

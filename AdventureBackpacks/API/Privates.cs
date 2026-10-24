@@ -60,11 +60,14 @@ public partial class ABAPI
             ItemName = backpack.ItemName,
             PrefabName = backpack.PrefabName,
             BackpackSizeByQuality = GetBackpackSizing(backpack),
-            WeightMultiplier = backpack.WeightMultiplier.Value,
-            CarryBonus = backpack.CarryBonus.Value,
-            SpeedMod = backpack.SpeedMod.Value,
-            EnableFreezing = backpack.EnableFreezing.Value,
-            BackpackBiome = backpack.BackpackBiome.Value
+            WeightMultiplier = backpack.WeightMultiplier?.Value ?? 1f,
+            CarryBonus = backpack.CarryBonus?.Value ?? 0,
+            ArmorPerLevel = backpack.ArmorPerLevel?.Value ?? 0,
+            SpeedMod = backpack.SpeedMod?.Value ?? 0f,
+            ScaleSpeedModByQuality = backpack.ScaleSpeedModByQuality?.Value ?? true,
+            // Only the legacy packs bind "Prevent freezing/cold?".
+            EnableFreezing = backpack.EnableFreezing?.Value ?? false,
+            BackpackBiome = backpack.BackpackBiome?.Value ?? BackpackBiomes.None
         };
         return definition;
     }

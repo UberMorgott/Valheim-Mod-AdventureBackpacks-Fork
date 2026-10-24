@@ -1,3 +1,36 @@
+## 1.10.0.0 - Morgott's fork: Ashlands and Deep North backpacks, new models, crafting from the backpack
+
+Ported from Vapok's Adventure Backpacks 2.4.6 (telemetry, container tabs and HD texture packs left out).
+
+* New backpacks: Cinderward Pack (Ashlands, Black Forge 3: heat resistance per level, Ashen cape stamina bonuses,
+  fire resistance from level 3) and Frostbound Haversack (Deep North, Black Forge 4: Moose Hide cape stamina bonuses,
+  at level 4 an adrenaline bar that fires "Second Wind Effect" when full). Both drop from their biome's creatures and
+  bosses. Translations for 35 languages.
+* New models for all biome backpacks. "Model Style" per backpack (local, restart) switches back to the original
+  models (Classic). Every bundle is compressed to the game's texel density: the classic models keep this fork's
+  textures, capped at 256 px (Mistlands and Plains shipped 2048 px maps), and the shared particle texture is 128 px.
+  The bundles take about a third of the space they did.
+* Upgrader idols: each biome backpack takes its biome's idol (Upgrader0Armor..Upgrader7Armor) at an upgrader station,
+  like vanilla armor.
+* "Armor Per Level" (default 1) and "Scale Speed Modifier By Level" per backpack. Armor no longer counts twice:
+  vanilla already adds the per-level armor for every level above 1.
+* Plains backpack: frost resistance from level 1 (was 3). Mistlands backpack: demister from level 2 (was 4).
+* Crafting and building use the materials in the equipped backpack; the requirement list shows "available/required".
+  Crafted items go into the backpack when the inventory is full. Settings in section "Automation" (local): enable,
+  output to backpack, consumption priority, leave one item in the backpack, total ingredient count. Replaces the
+  transpilers that kept an equipped item out of the recipe count; equipped items still never count or pay.
+  API: IsCraftFromBackpackEnabled, IsCraftingContextActive, SuppressNativeCrafting/UnsuppressNativeCrafting.
+* Pickups go into the backpack when it already holds that item, or when the inventory is full ("Enable Auto Store to
+  Backpack", "Enable Inventory Overflow To Backpack"). Only whole stacks move, and never while the inventory is open.
+* Backpack tooltip: armor, the damage modifiers it grants, and on the worn backpack the open and quickdrop keys.
+* A full backpack keeps its contents when the player dies, when a tombstone or networked chest is looted (the items
+  move on the owner's answer, after TakeAll returned) and when it is put on or taken off an armor or item stand.
+  The move protection is now a counter, so nested moves no longer switch it back on early.
+* API: IsBackpackOpen, GetEquippedBackpackInventory, GetBackpackInventory, GetAllBackpackInventories (and Try
+  variants), WouldStorePickup. BackpackDefinition: ArmorPerLevel, ScaleSpeedModByQuality.
+* Quick transfer is unchanged: backpack <-> inventory without a chest; with a chest, backpack and inventory each
+  move to the chest, chest -> inventory (overflow into the backpack).
+
 ## 1.9.15.0 - Morgott's fork: backpack panel always available, gamepad, docking API
 
 * The backpack has its own panel whenever the inventory is open and a backpack is worn, with or without a chest

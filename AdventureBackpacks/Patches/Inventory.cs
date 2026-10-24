@@ -5,7 +5,9 @@ using System.Linq;
 using AdventureBackpacks.Assets;
 using AdventureBackpacks.Components;
 using AdventureBackpacks.Extensions;
+using AdventureBackpacks.Features;
 using HarmonyLib;
+
 namespace AdventureBackpacks.Patches;
 
 
@@ -215,6 +217,10 @@ public static class InventoryPatches
             return true;
         }
 
+        // Paying for a recipe or a piece never empties a backpack.
+        if (CraftingContext.IsActive)
+            return true;
+
         if (AdventureBackpacks.PerformYardSale || AdventureBackpacks.QuickDropping || AdventureBackpacks.BypassMoveProtection)
             return true;
 
@@ -295,9 +301,163 @@ public static class InventoryPatches
 
                     return noInception;
                 }
+
+                return true;
+            }
+
+            var player = Player.m_localPlayer;
+            if (player == null || __instance != player.GetInventory() || _movingItemBetweenContainers)
+                return true;
+
+            // A crafted item that no longer fits the inventory goes into the backpack.
+            if (CraftingContext.IsActive && !StoreToBackpack.CanInventoryAccept(__instance, item, item.m_stack) &&
+                CraftFromBackpack.CanCraftOutputToBackpack(player, out var craftInventory) && StoreToBackpack.TryStoreItem(item, craftInventory))
+            {
+                __result = true;
+                return false;
+            }
+
+            if (StoreToBackpack.ShouldStoreToBackpack(player, item, out var backpackInventory) && StoreToBackpack.TryStoreItem(item, backpackInventory))
+            {
+                __result = true;
+                return false;
             }
 
             return true;
+        }
+    }
+
+    // Pickup, autopickup and crafting ask first whether the inventory has room; the backpack's room counts when
+    // the item would go there (AddItemPatch).
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.CanAddItem), typeof(ItemDrop.ItemData), typeof(int))]
+    [HarmonyPriority(Priority.First)]
+    static class CanAddItemPatch
+    {
+        private static bool _evaluating;
+
+        static bool Prefix(Inventory __instance, ItemDrop.ItemData item, int stack, ref bool __result)
+        {
+            var player = Player.m_localPlayer;
+            if (_evaluating || item == null || player == null || __instance != player.GetInventory() || _movingItemBetweenContainers || item.IsBackpack())
+                return true;
+
+            _evaluating = true;
+            try
+            {
+                if (StoreToBackpack.CanInventoryAccept(__instance, item, stack))
+                    return true;
+
+                if (CraftingContext.IsActive && CraftFromBackpack.CanCraftOutputToBackpack(player, out var craftInventory) &&
+                    StoreToBackpack.CanInventoryAccept(craftInventory, item, stack))
+                {
+                    __result = true;
+                    return false;
+                }
+
+                if (StoreToBackpack.ShouldStoreToBackpack(player, item, out _))
+                {
+                    __result = true;
+                    return false;
+                }
+
+                return true;
+            }
+            finally
+            {
+                _evaluating = false;
+            }
+        }
+    }
+
+    // DoCrafting creates the crafted item by name; when the inventory is full it goes into the backpack instead.
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.AddItem), typeof(string), typeof(int), typeof(int), typeof(int), typeof(long), typeof(string), typeof(Vector2i), typeof(bool), typeof(bool), typeof(bool))]
+    [HarmonyPriority(Priority.First)]
+    static class AddItemCraftOutputPatch
+    {
+        static bool Prefix(Inventory __instance, string name, int stack, int quality, int variant, long crafterID, string crafterName, bool cheated, bool pickedUp, bool dropIfFullInv, ref ItemDrop.ItemData __result)
+        {
+            var player = Player.m_localPlayer;
+            if (!CraftingContext.IsActive || player == null || __instance == null || __instance != player.GetInventory() || _movingItemBetweenContainers || ObjectDB.instance == null)
+                return true;
+
+            var itemData = ObjectDB.instance.GetItemPrefab(name)?.GetComponent<ItemDrop>()?.m_itemData;
+            if (itemData == null || itemData.IsBackpack() || StoreToBackpack.CanInventoryAccept(__instance, itemData, stack))
+                return true;
+
+            if (!CraftFromBackpack.CanCraftOutputToBackpack(player, out var backpackInventory) || !StoreToBackpack.CanInventoryAccept(backpackInventory, itemData, stack))
+                return true;
+
+            var created = backpackInventory.AddItem(name, stack, quality, variant, crafterID, crafterName, new Vector2i(-1, -1), cheated, pickedUp, dropIfFullInv);
+            if (created == null)
+                return true;
+
+            __result = created;
+            return false;
+        }
+    }
+
+    // Inside a CraftingContext the backpack pays its share before the inventory does, and equipped items last.
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.RemoveItem), typeof(string), typeof(int), typeof(int), typeof(bool))]
+    [HarmonyPriority(600)]
+    static class RemoveItemByNamePatch
+    {
+        static bool Prefix(Inventory __instance, string name, ref int amount, int itemQuality)
+        {
+            var player = Player.m_localPlayer;
+            if (!CraftingContext.IsActive || player == null || __instance != player.GetInventory() || amount <= 0 || string.IsNullOrEmpty(name))
+                return true;
+
+            // CountItems left equipped items out, so they are taken last (never, when the count was right).
+            CraftFromBackpack.ProtectEquippedItems(__instance, name);
+
+            if (!CraftFromBackpack.CanCraftFromBackpack(player, out var backpackInventory))
+                return true;
+
+            amount = CraftFromBackpack.DeductBackpackCraftingItem(player, backpackInventory, name, amount, itemQuality);
+            return amount > 0;
+        }
+    }
+
+    // Inside a CraftingContext an equipped item is not a material, and the backpack's materials are.
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.CountItems), typeof(string), typeof(int), typeof(bool))]
+    [HarmonyPriority(600)]
+    static class CountItemsPatch
+    {
+        static void Postfix(Inventory __instance, string name, int quality, ref int __result)
+        {
+            var player = Player.m_localPlayer;
+            if (__instance == null || !CraftingContext.IsActive || player == null || __instance != player.GetInventory())
+                return;
+
+            var equipped = 0;
+            foreach (var item in __instance.GetAllItems())
+            {
+                if (item != null && item.m_equipped && item.m_shared != null && item.m_shared.m_name == name && (quality <= 0 || item.m_quality == quality))
+                    equipped += item.m_stack;
+            }
+
+            if (equipped > 0)
+                __result = Math.Max(0, __result - equipped);
+
+            var backpackInventory = CraftingContext.ActiveBackpackInventory;
+            if (CraftingContext.CanCraftFromBackpack && backpackInventory != null)
+                __result += CraftFromBackpack.UsableCount(quality > 0 ? backpackInventory.CountItems(name, quality) : backpackInventory.CountItems(name));
+        }
+    }
+
+    [HarmonyPatch(typeof(Inventory), nameof(Inventory.HaveItem), typeof(string), typeof(bool))]
+    [HarmonyPriority(600)]
+    static class HaveItemPatch
+    {
+        static void Postfix(Inventory __instance, string name, ref bool __result)
+        {
+            var player = Player.m_localPlayer;
+            if (__result || !CraftingContext.IsActive || player == null || __instance != player.GetInventory())
+                return;
+
+            var backpackInventory = CraftingContext.ActiveBackpackInventory;
+            if (CraftingContext.CanCraftFromBackpack && backpackInventory != null && CraftFromBackpack.UsableCount(backpackInventory.CountItems(name)) > 0)
+                __result = true;
         }
     }
 
@@ -345,6 +505,7 @@ public static class InventoryPatches
     {
         static void Prefix(Inventory fromInventory, Inventory __instance)
         {
+            AdventureBackpacks.PushBypassMoveProtection();
             if (fromInventory == null)
                 return;
 
@@ -354,9 +515,10 @@ public static class InventoryPatches
             }
         }
 
-        static void Postfix()
+        static void Finalizer()
         {
             _movingItemBetweenContainers = false;
+            AdventureBackpacks.PopBypassMoveProtection();
         }
     }
 

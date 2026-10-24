@@ -17,6 +17,7 @@ internal class LegacySilverBackpack : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(45);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         RegisterEnableFreezing(true);
     }
@@ -28,7 +29,7 @@ internal class LegacySilverBackpack : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
         if (EnableFreezing.Value)
             modifierList.Add(FrostResistance.EffectMod);
 

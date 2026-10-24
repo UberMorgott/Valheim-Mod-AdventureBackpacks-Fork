@@ -17,6 +17,12 @@
   "adventurebackpacks_item_backpack_mistlands": "Explorers Wisppack",
   "adventurebackpacks_item_backpack_mistlands_description": "A finely crafted, mystical backpack. Complete with it's own Box of Holding. No one is quite sure how it works.",
 
+  "adventurebackpacks_item_backpack_ashlands": "Cinderward Pack",
+  "adventurebackpacks_item_backpack_ashlands_description": "Flametal ribs and charred bone keep the heat off your back. Not the flames, just the heat.",
+
+  "adventurebackpacks_item_backpack_deepnorth": "Frostbound Haversack",
+  "adventurebackpacks_item_backpack_deepnorth_description": "Moose hide over a frost core. Heavy, warm, and it seems to know when you are about to go down.",
+
   "adventurebackpacks_item_rugged_backpack": "Old Rugged Backpack",
   "adventurebackpacks_item_rugged_backpack_description": "A rugged backpack, complete with buckles and fine leather straps.",
 
@@ -36,6 +42,9 @@
   "adventurebackpacks_level": "Level",
   "adventurebackpacks_effect": "Effect",
   "adventurebackpacks_quick_drop_unavailable": "Quick Drop Unavailable.",
+  "adventurebackpacks_open_backpack": "Open Backpack",
+  "adventurebackpacks_close_backpack": "Close Backpack",
+  "adventurebackpacks_quickdrop_backpack": "Quickdrop Backpack",
   
   "adventurebackpacks_se_cold_immunity": "Cold Immunity",
   "adventurebackpacks_se_frost_resistance": "Frost Resistance",

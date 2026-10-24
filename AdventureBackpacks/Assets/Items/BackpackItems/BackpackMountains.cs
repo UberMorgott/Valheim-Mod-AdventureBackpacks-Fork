@@ -20,6 +20,7 @@ internal class BackpackMountains : BackpackItem
 
         AddUpgradeIngredient("WolfPelt", 5);
         AddUpgradeIngredient("Silver", 5);
+        AddUpgraderIngredient("Upgrader3Armor", 1);
 
         Recipe.AddDrop("Fenring_Cultist", 0.002f, 1);
         Recipe.AddDrop("Ulv", 0.001f, 1);
@@ -37,6 +38,7 @@ internal class BackpackMountains : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(20);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.Mountains) != BackpackBiomes.None)
         {
@@ -49,7 +51,7 @@ internal class BackpackMountains : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }

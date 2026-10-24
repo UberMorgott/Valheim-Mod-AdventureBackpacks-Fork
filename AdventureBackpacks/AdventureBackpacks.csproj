@@ -73,7 +73,9 @@
         <Compile Include="Assets\Items\AssetItem.cs" />
         <Compile Include="Assets\Items\BackpackItem.cs" />
         <Compile Include="Assets\Items\BackpackRecipe.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackAshlands.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackBlackForest.cs" />
+        <Compile Include="Assets\Items\BackpackItems\BackpackDeepNorth.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackMeadows.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackMistlands.cs" />
         <Compile Include="Assets\Items\BackpackItems\BackpackMountains.cs" />
@@ -88,14 +90,18 @@
         <Compile Include="Extensions\InventoryExtensions.cs" />
         <Compile Include="Extensions\ItemDataExtensions.cs" />
         <Compile Include="Extensions\PlayerExtensions.cs" />
+        <Compile Include="Features\CraftFromBackpack.cs" />
+        <Compile Include="Features\CraftingContext.cs" />
         <Compile Include="Features\EquipmentEffectCache.cs" />
         <Compile Include="Features\PieceShaderSwap.cs" />
         <Compile Include="Features\QuickTransfer.cs" />
+        <Compile Include="Features\StoreToBackpack.cs" />
         <Compile Include="Patches\ArmorStand.cs" />
         <Compile Include="Patches\BackpackPanel.cs" />
         <Compile Include="Patches\Container.cs" />
         <Compile Include="Patches\Door.cs" />
         <Compile Include="Patches\GuiBar.cs" />
+        <Compile Include="Patches\Hud.cs" />
         <Compile Include="Patches\Humanoid.cs" />
         <Compile Include="Patches\Inventory.cs" />
         <Compile Include="Patches\InventoryGui.cs" />
@@ -125,6 +131,14 @@
         <EmbeddedResource Include="Assets\Bundles\backpack_mountains" />
         <EmbeddedResource Include="Assets\Bundles\backpack_plains" />
         <EmbeddedResource Include="Assets\Bundles\backpack_swamp" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_ashlands" />
+        <EmbeddedResource Include="Assets\Bundles\backpack_deepnorth" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_black_forest" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_meadows" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_mistlands" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_mountains" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_plains" />
+        <EmbeddedResource Include="Assets\Bundles\classic_backpack_swamp" />
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />

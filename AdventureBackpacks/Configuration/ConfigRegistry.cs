@@ -179,6 +179,9 @@ namespace AdventureBackpacks.Configuration
             BindLocal("Local Config", "Replace Shader", true,
                 new ConfigDescription("Toggle To use the Material Shader Replacer (Requires Game Restart)",
                     null, new ConfigurationManagerAttributes { Order = 1 }), ref ReplaceShader);
+
+            Features.CraftFromBackpack.BindConfig();
+            Features.StoreToBackpack.BindConfig();
         }
     }
 

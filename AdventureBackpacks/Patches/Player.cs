@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using AdventureBackpacks.Assets.Factories;
+using AdventureBackpacks.Features;
 using HarmonyLib;
 using JetBrains.Annotations;
 
@@ -16,6 +18,23 @@ public class PlayerPatches
         static void Postfix(Player __instance)
         {
             __instance.gameObject.AddComponent<Container>();
+        }
+    }
+
+    // Dying moves the inventory into the tombstone, a full backpack included.
+    [HarmonyPatch(typeof(Player), nameof(Player.OnDeath))]
+    static class PlayerOnDeathPatch
+    {
+        static void Prefix(Player __instance)
+        {
+            if (__instance == Player.m_localPlayer)
+                AdventureBackpacks.PushBypassMoveProtection();
+        }
+
+        static void Finalizer(Player __instance)
+        {
+            if (__instance == Player.m_localPlayer)
+                AdventureBackpacks.PopBypassMoveProtection();
         }
     }
 
@@ -51,83 +70,8 @@ public class PlayerPatches
         }
     }
 
-    // itemCount comes first so the transpilers can call this with the CountItems result already on the stack.
-    public static int AdjustCountIfEquipped(int itemCount, Player player, Piece.Requirement resource)
-    {
-        var num = itemCount;
-
-        if (num < 1 || resource == null || resource.m_resItem == null || resource.m_resItem.m_itemData == null || !resource.m_resItem.m_itemData.IsEquipable())
-            return num;
-
-        var inventory = player?.GetInventory();
-        if (inventory == null)
-            return num;
-
-        var itemName = resource.m_resItem.m_itemData.m_shared?.m_name;
-        if (string.IsNullOrEmpty(itemName))
-            return num;
-
-        var equippedItems = inventory.GetEquippedItems();
-
-        if (equippedItems != null && equippedItems.Any(x => x.m_shared != null && x.m_shared.m_name.Equals(itemName, StringComparison.Ordinal)))
-        {
-            num -= 1;
-        }
-
-        return num;
-    }
-
-    public static int AdjustCountIfEquipped(Player player, Piece.Requirement resource, int itemCount)
-    {
-        return AdjustCountIfEquipped(itemCount, player, resource);
-    }
-
-    // amount comes first so the transpiler can call this with the GetAmount * multiplier result already on the stack.
-    public static int ConsumeUnEquippedItems(int amount, Player player, Piece.Requirement resource)
-    {
-        var num = amount;
-
-        if (num < 1 || resource == null || resource.m_resItem == null || resource.m_resItem.m_itemData == null || !resource.m_resItem.m_itemData.IsEquipable())
-            return num;
-
-        var itemName = resource.m_resItem.m_itemData.m_shared?.m_name;
-        if (string.IsNullOrEmpty(itemName))
-            return num;
-
-        var allItems = player?.m_inventory?.GetAllItems();
-        if (allItems == null)
-            return num;
-
-        var resourceItems = allItems.Where(x => x.m_shared != null && x.m_shared.m_name.Equals(itemName, StringComparison.Ordinal)).ToList();
-
-        var removedCounter = 0;
-        for (int i = 0; i < num; i++)
-        {
-            foreach (var item in resourceItems)
-            {
-                if (item.m_equipped)
-                    continue;
-
-                if (removedCounter < amount)
-                {
-                    player.m_inventory.RemoveItem(item, 1);
-                    removedCounter++;
-                }
-            }
-        }
-
-        return num - removedCounter;
-    }
-
-    public static int ConsumeUnEquippedItems(Player player, Piece.Requirement resource, int amount)
-    {
-        return ConsumeUnEquippedItems(amount, player, resource);
-    }
-
-    // Local slots differ per method and shift between game versions, so the transpilers below read
-    // them out of the real IL instead of hardcoding indices. In 1.0.7 the loop variable is loc 3,
-    // not loc 2, and the amount is stloc.s 4, not stloc.3 — those stale indices are exactly what
-    // made ConsumeResources fail to match and HaveRequirementItems fail to compile.
+    // Turns a stloc into the matching ldloc; local slots differ per method and between game versions, so
+    // transpilers read them out of the real IL instead of hardcoding indices.
     internal static CodeInstruction LoadLocal(CodeInstruction store)
     {
         if (store.opcode == OpCodes.Stloc_0) return new CodeInstruction(OpCodes.Ldloc_0);
@@ -137,116 +81,139 @@ public class PlayerPatches
         return new CodeInstruction(store.opcode == OpCodes.Stloc_S ? OpCodes.Ldloc_S : OpCodes.Ldloc, store.operand);
     }
 
-    // `foreach (Piece.Requirement r in resources)` stores the current element right after ldelem.ref.
-    private static CodeInstruction LoadRequirement(List<CodeInstruction> code, int anchor)
+    // Kept for mods that call them by reflection; the crafting patches below use CraftingContext instead.
+    [Obsolete("Use CraftingContext and CraftFromBackpack.")]
+    public static int AdjustCountIfEquipped(int itemCount, Player player, Piece.Requirement resource)
     {
-        for (var i = anchor; i > 0; i--)
+        var itemName = resource?.m_resItem?.m_itemData?.m_shared?.m_name;
+        if (player == null || string.IsNullOrEmpty(itemName))
+            return itemCount;
+
+        var num = itemCount;
+        if (num > 0 && resource.m_resItem.m_itemData.IsEquipable())
         {
-            if (code[i - 1].opcode == OpCodes.Ldelem_Ref && code[i].IsStloc())
-                return LoadLocal(code[i]);
+            var equippedItems = player.GetInventory()?.GetEquippedItems();
+            if (equippedItems != null && equippedItems.Any(x => x?.m_shared != null && x.m_shared.m_name == itemName))
+                num -= 1;
         }
 
-        return null;
+        return num + CraftFromBackpack.GetBackpackItemCount(player, itemName);
     }
 
-    [HarmonyPatch(typeof(Player), nameof(Player.HaveRequirementItems))]
-    static class PlayerHaveRequirementItemsPatch
+    [Obsolete("Use CraftingContext and CraftFromBackpack.")]
+    public static int AdjustCountIfEquipped(Player player, Piece.Requirement resource, int itemCount)
     {
+        return AdjustCountIfEquipped(itemCount, player, resource);
+    }
 
-        // Anchored on the real call to Inventory.CountItems(string,int,bool). The adjustment is inserted directly
-        // after the call and works on the stack value, so it does not depend on what the caller (or another
-        // mod's transpiler) does with the result next.
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    [Obsolete("Use CraftingContext and CraftFromBackpack.")]
+    public static int ConsumeUnEquippedItems(int amount, Player player, Piece.Requirement resource)
+    {
+        var itemName = resource?.m_resItem?.m_itemData?.m_shared?.m_name;
+        if (amount < 1 || player == null || string.IsNullOrEmpty(itemName))
+            return amount;
+
+        return CraftFromBackpack.ConsumeCraftingItem(player, itemName, amount);
+    }
+
+    [Obsolete("Use CraftingContext and CraftFromBackpack.")]
+    public static int ConsumeUnEquippedItems(Player player, Piece.Requirement resource, int amount)
+    {
+        return ConsumeUnEquippedItems(amount, player, resource);
+    }
+
+    // Requirement checks and payments of the local player run inside a CraftingContext, see InventoryPatches:
+    // its counts leave out equipped items and add the equipped backpack. Piece placement pays inside
+    // UpdatePlacement, crafting inside InventoryGui.DoCrafting.
+    private static void EnterFor(Player player)
+    {
+        if (player != null && player == Player.m_localPlayer)
+            CraftingContext.Enter();
+    }
+
+    private static void ExitFor(Player player)
+    {
+        if (player != null && player == Player.m_localPlayer)
+            CraftingContext.Exit();
+    }
+
+    // Every overload: their parameter lists change between game versions.
+    [HarmonyPatch]
+    static class PlayerHaveRequirementsPatch
+    {
+        [UsedImplicitly]
+        static IEnumerable<MethodBase> TargetMethods()
         {
-            var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) });
-            var adjustMethod = AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(AdjustCountIfEquipped), new[] { typeof(int), typeof(Player), typeof(Piece.Requirement) });
-            var code = instructions.ToList();
+            return typeof(Player).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Where(m => m.Name is nameof(Player.HaveRequirements) or nameof(Player.HaveRequirementItems));
+        }
 
-            var patched = false;
-            for (var i = 0; i < code.Count; i++)
+        [HarmonyPriority(900)]
+        static void Prefix(Player __instance) => EnterFor(__instance);
+
+        [HarmonyPriority(100)]
+        static void Finalizer(Player __instance) => ExitFor(__instance);
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.UpdatePlacement))]
+    static class PlayerUpdatePlacementPatch
+    {
+        [HarmonyPriority(900)]
+        static void Prefix(Player __instance) => EnterFor(__instance);
+
+        [HarmonyPriority(100)]
+        static void Finalizer(Player __instance) => ExitFor(__instance);
+    }
+
+    // "Requires only one ingredient" recipes pick the ingredient here; vanilla only looks at the inventory.
+    [HarmonyPatch(typeof(Player), nameof(Player.GetFirstRequiredItem))]
+    static class PlayerGetFirstRequiredItemPatch
+    {
+        static void Postfix(Player __instance, Inventory inventory, Recipe recipe, int qualityLevel, ref int amount, ref int extraAmount, int craftMultiplier, ref ItemDrop.ItemData __result)
+        {
+            if (__result != null || recipe?.m_resources == null || !CraftFromBackpack.CanCraftFromBackpack(__instance, out var backpackInventory))
+                return;
+
+            var station = __instance.GetCurrentCraftingStation();
+            foreach (var requirement in recipe.m_resources)
             {
-                if (!code[i].Calls(countItemsMethod))
+                if ((station != null && station.m_upgrader != requirement.m_upgraderResource) || (station == null && requirement.m_upgraderResource) ||
+                    !requirement.m_resItem || requirement.m_resItem.m_itemData?.m_shared == null)
                     continue;
 
-                var requirement = LoadRequirement(code, i);
-                if (requirement == null)
+                var needed = requirement.GetAmount(qualityLevel) * craftMultiplier;
+                if (needed <= 0)
+                    continue;
+
+                var name = requirement.m_resItem.m_itemData.m_shared.m_name;
+                for (var quality = 1; quality <= requirement.m_resItem.m_itemData.m_shared.m_maxQuality; quality++)
                 {
-                    AdventureBackpacks.Log.LogError($"{nameof(Player.HaveRequirementItems)} transpiler: Piece.Requirement loop local not found. Crafting requirements will not account for an equipped backpack.");
-                    return instructions;
+                    var count = inventory.CountItems(name, quality) + CraftFromBackpack.UsableCount(backpackInventory.CountItems(name, quality));
+                    if (count < needed)
+                        continue;
+
+                    var items = backpackInventory.GetAllItems();
+                    var match = items.FirstOrDefault(x => x?.m_shared != null && x.m_shared.m_name == name && x.m_quality == quality && x.m_stack >= needed)
+                                ?? items.FirstOrDefault(x => x?.m_shared != null && x.m_shared.m_name == name && x.m_quality == quality);
+                    if (match == null)
+                        continue;
+
+                    amount = needed;
+                    extraAmount = requirement.m_extraAmountOnlyOneIngredient;
+                    __result = match;
+                    return;
                 }
-
-                // [int itemCount] is on the stack: push Player this, Piece.Requirement, call -> adjusted int.
-                code.InsertRange(i + 1, new[]
-                {
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    requirement,
-                    new CodeInstruction(OpCodes.Call, adjustMethod)
-                });
-                i += 3;
-                patched = true;
             }
-
-            if (!patched)
-                AdventureBackpacks.Log.LogError($"{nameof(Player.HaveRequirementItems)} transpiler: anchor Inventory.CountItems(string,int,bool) not found. Crafting requirements will not account for an equipped backpack.");
-
-            return code;
         }
     }
 
-    [HarmonyPatch(typeof(Player), nameof(Player.ConsumeResources))]
-    static class PlayerConsumeResourcesPatch
+    [HarmonyPatch(typeof(Player), nameof(Player.OnDestroy))]
+    static class PlayerOnDestroyPatch
     {
-
-        // Anchored on the Mul that follows the real call to Piece.Requirement.GetAmount(int)
-        // (`GetAmount(qualityLevel) * multiplier`). The adjustment is inserted directly after the Mul and works on
-        // the stack value, so it does not depend on how the result is stored.
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        static void Postfix(Player __instance)
         {
-            var getAmountMethod = AccessTools.DeclaredMethod(typeof(Piece.Requirement), "GetAmount", new[] { typeof(int) });
-            var consumeMethod = AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(ConsumeUnEquippedItems), new[] { typeof(int), typeof(Player), typeof(Piece.Requirement) });
-            var code = instructions.ToList();
-
-            var patched = false;
-            for (var i = 0; i < code.Count; i++)
-            {
-                if (code[i].opcode != OpCodes.Mul)
-                    continue;
-
-                var getAmountIndex = -1;
-                for (var j = i - 1; j >= Math.Max(0, i - 5); j--)
-                {
-                    if (code[j].Calls(getAmountMethod))
-                    {
-                        getAmountIndex = j;
-                        break;
-                    }
-                }
-
-                if (getAmountIndex < 0)
-                    continue;
-
-                var requirement = LoadRequirement(code, getAmountIndex);
-                if (requirement == null)
-                {
-                    AdventureBackpacks.Log.LogError($"{nameof(Player.ConsumeResources)} transpiler: Piece.Requirement loop local not found. Crafting may consume an equipped backpack.");
-                    return instructions;
-                }
-
-                // [int amount] is on the stack: push Player this, Piece.Requirement, call -> adjusted amount.
-                code.InsertRange(i + 1, new[]
-                {
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    requirement,
-                    new CodeInstruction(OpCodes.Call, consumeMethod)
-                });
-                i += 3;
-                patched = true;
-            }
-
-            if (!patched)
-                AdventureBackpacks.Log.LogError($"{nameof(Player.ConsumeResources)} transpiler: anchor Piece.Requirement.GetAmount(int) not found. Crafting may consume an equipped backpack.");
-
-            return code;
+            if (__instance == Player.m_localPlayer)
+                CraftingContext.Reset();
         }
     }
 }

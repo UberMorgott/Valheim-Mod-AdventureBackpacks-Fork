@@ -24,6 +24,7 @@ internal class BackpackMistlands : BackpackItem
         AddUpgradeIngredient("ScaleHide", 4);
         AddUpgradeIngredient("Eitr", 2);
         AddUpgradeIngredient("Softtissue", 5);
+        AddUpgraderIngredient("Upgrader5Armor", 1);
 
         Recipe.AddDrop("Dverger", 0.002f, 1);
         Recipe.AddDrop("DvergerMage", 0.002f, 1);
@@ -42,11 +43,12 @@ internal class BackpackMistlands : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(30);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.Mistlands) != BackpackBiomes.None)
         {
             EffectsFactory.EffectList[BackpackEffect.FeatherFall].RegisterEffectBiomeQuality(BackpackBiomes.Mistlands, 3);
-            EffectsFactory.EffectList[BackpackEffect.Demister].RegisterEffectBiomeQuality(BackpackBiomes.Mistlands, 4);
+            EffectsFactory.EffectList[BackpackEffect.Demister].RegisterEffectBiomeQuality(BackpackBiomes.Mistlands, 2);
             EffectsFactory.EffectList[BackpackEffect.FrostResistance].RegisterEffectBiomeQuality(BackpackBiomes.Mistlands, 2);
             EffectsFactory.EffectList[BackpackEffect.ColdResistance].RegisterEffectBiomeQuality(BackpackBiomes.Mistlands, 1);
         }
@@ -54,7 +56,7 @@ internal class BackpackMistlands : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }
