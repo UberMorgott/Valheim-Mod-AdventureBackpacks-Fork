@@ -20,6 +20,7 @@ internal class BackpackPlains : BackpackItem
 
         AddUpgradeIngredient("LoxPelt", 2);
         AddUpgradeIngredient("BlackMetal", 5);
+        AddUpgraderIngredient("Upgrader4Armor", 1);
 
         Recipe.AddDrop("Goblin", 0.002f, 1);
         Recipe.AddDrop("GoblinArcher", 0.002f, 1);
@@ -39,10 +40,11 @@ internal class BackpackPlains : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(25);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.Plains) != BackpackBiomes.None)
         {
-            EffectsFactory.EffectList[BackpackEffect.FrostResistance].RegisterEffectBiomeQuality(BackpackBiomes.Plains, 3);
+            EffectsFactory.EffectList[BackpackEffect.FrostResistance].RegisterEffectBiomeQuality(BackpackBiomes.Plains, 1);
             EffectsFactory.EffectList[BackpackEffect.ColdResistance].RegisterEffectBiomeQuality(BackpackBiomes.Plains, 1);
         }
 
@@ -50,7 +52,7 @@ internal class BackpackPlains : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }

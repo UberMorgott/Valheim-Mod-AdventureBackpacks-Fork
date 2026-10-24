@@ -21,6 +21,7 @@ internal class BackpackBlackForest : BackpackItem
 
         AddUpgradeIngredient("TrollHide", 3);
         AddUpgradeIngredient("Bronze", 3);
+        AddUpgraderIngredient("Upgrader1Armor", 1);
 
         Recipe.AddDrop("Greydwarf", 0.002f, 1);
         Recipe.AddDrop("Greydwarf_Elite", 0.004f, 1);
@@ -40,6 +41,7 @@ internal class BackpackBlackForest : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(10);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.BlackForest) != BackpackBiomes.None)
         {
@@ -50,7 +52,7 @@ internal class BackpackBlackForest : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }

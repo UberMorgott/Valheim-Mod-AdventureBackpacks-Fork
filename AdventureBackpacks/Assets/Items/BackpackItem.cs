@@ -41,11 +41,18 @@ internal abstract class BackpackItem : AssetItem, IBackpackItem
     internal Dictionary<int, ConfigEntry<Vector2>> BackpackSize;
     internal ConfigEntry<float> WeightMultiplier;
     internal ConfigEntry<int> CarryBonus;
+    internal ConfigEntry<float> HeatResistance;
+    internal ConfigEntry<int> ArmorPerLevel;
     internal ConfigEntry<float> SpeedMod;
+    internal ConfigEntry<bool> ScaleSpeedModByQuality;
     internal ConfigEntry<bool> EnableFreezing;
     internal ConfigEntry<bool> ShowBackpackStatusEffect;
     internal ConfigEntry<string> CustomStatusEffectName;
     internal ConfigEntry<BackpackBiomes> BackpackBiome;
+    internal ConfigEntry<ModelStyle> ModelStyle;
+
+    protected string EnglishSection => _englishSection;
+    protected string LocalizedCategory => _localizedCategory;
 
     internal ConfigRegistry Config => _config;
     internal ModLogger Log => _logger;
@@ -186,14 +193,54 @@ internal abstract class BackpackItem : AssetItem, IBackpackItem
         CustomStatusEffectName!.SettingChanged += Backpacks.UpdateItemDataConfigValues;
     }
 
-    internal virtual void RegisterSpeedMod(float defaultValue = -0.15f)
+    internal virtual void RegisterHeatResistance(float defaultValue = 0.1f)
+    {
+        ConfigRegistry.BindSynced(_englishSection, "Heat Resistance", defaultValue,
+            new ConfigDescription("Heat resistance per item level. Reduces lava damage and delays boiling water damage. Does nothing against burning.",
+                new AcceptableValueRange<float>(0f, 0.25f),
+                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 11 }), ref HeatResistance);
+
+        HeatResistance!.SettingChanged += Backpacks.UpdateItemDataConfigValues;
+    }
+
+    internal virtual void RegisterArmorPerLevel(int defaultValue = 1)
+    {
+        ConfigRegistry.BindSynced(_englishSection, "Armor Per Level", defaultValue,
+            new ConfigDescription("The armor value per quality level provided by the backpack.",
+                new AcceptableValueRange<int>(0, 50),
+                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 7 }), ref ArmorPerLevel);
+
+        ArmorPerLevel!.SettingChanged += (_, _) => ResetPrefabArmor();
+        ArmorPerLevel.SettingChanged += Backpacks.UpdateItemDataConfigValues;
+        ResetPrefabArmor();
+    }
+
+    internal virtual void RegisterSpeedMod(float defaultValue = -0.15f, bool defaultScale = true)
     {
         ConfigRegistry.BindSynced(_englishSection, "Speed Modifier", defaultValue,
             new ConfigDescription("Wearing the backpack slows you down by this much.",
                 new AcceptableValueRange<float>(-1f, -0f),
-                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 7 }), ref SpeedMod);
+                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 8 }), ref SpeedMod);
 
         SpeedMod!.SettingChanged += Backpacks.UpdateItemDataConfigValues;
+
+        ConfigRegistry.BindSynced(_englishSection, "Scale Speed Modifier By Level", defaultScale,
+            new ConfigDescription("When enabled, the speed modifier is reduced as the backpack is upgraded (divided by quality level). When disabled, the speed modifier remains constant across all quality levels.",
+                null,
+                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 9 }), ref ScaleSpeedModByQuality);
+
+        ScaleSpeedModByQuality!.SettingChanged += Backpacks.UpdateItemDataConfigValues;
+    }
+
+    internal float GetSpeedModifier(int quality)
+    {
+        if (SpeedMod == null)
+            return 0f;
+
+        if (ScaleSpeedModByQuality == null || ScaleSpeedModByQuality.Value)
+            return quality > 0 ? SpeedMod.Value / quality : SpeedMod.Value;
+
+        return SpeedMod.Value;
     }
 
     internal virtual void RegisterEnableFreezing(bool defaultValue = true)
@@ -201,7 +248,7 @@ internal abstract class BackpackItem : AssetItem, IBackpackItem
         ConfigRegistry.BindSynced(_englishSection, "Prevent freezing/cold?", defaultValue,
             new ConfigDescription("Wearing the backpack protects you against freezing/cold, just like capes.",
                 null,
-                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 8 }), ref EnableFreezing);
+                new ConfigurationManagerAttributes { Category = _localizedCategory, Order = 10 }), ref EnableFreezing);
 
         EnableFreezing!.SettingChanged += Backpacks.UpdateItemDataConfigValues;
     }

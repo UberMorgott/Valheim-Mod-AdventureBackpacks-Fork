@@ -22,6 +22,7 @@ internal class BackpackMeadows : BackpackItem
 
         AddUpgradeIngredient("LeatherScraps", 5);
         AddUpgradeIngredient("DeerHide", 3);
+        AddUpgraderIngredient("Upgrader0Armor", 1);
 
         Recipe.AddDrop("Greyling", 0.002f, 1);
         Recipe.AddDrop("Eikthyr", 0.04f, 1);
@@ -37,6 +38,7 @@ internal class BackpackMeadows : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier();
         RegisterCarryBonus(5);
+        RegisterArmorPerLevel();
         RegisterSpeedMod();
         if ((BackpackBiome.Value & BackpackBiomes.Meadows) != BackpackBiomes.None)
             EffectsFactory.EffectList[BackpackEffect.ColdResistance].RegisterEffectBiomeQuality(BackpackBiomes.Meadows, 3);
@@ -44,7 +46,7 @@ internal class BackpackMeadows : BackpackItem
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         statusEffect.m_addMaxCarryWeight = CarryBonus.Value * quality;
     }

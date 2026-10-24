@@ -7,8 +7,10 @@ using AdventureBackpacks.Assets;
 using AdventureBackpacks.Components;
 using AdventureBackpacks.Configuration;
 using AdventureBackpacks.Extensions;
+using AdventureBackpacks.Features;
 using HarmonyLib;
 using JetBrains.Annotations;
+using TMPro;
 using UnityEngine;
 
 namespace AdventureBackpacks.Patches;
@@ -22,14 +24,23 @@ internal static class InventoryGuiPatches
     static class InventoryGuiDoCraftingPrefix
     {
         [UsedImplicitly]
+        [HarmonyPriority(900)]
         static void Prefix(InventoryGui __instance)
         {
             AdventureBackpacks.Log.Debug($"########################################");
             AdventureBackpacks.Log.Debug($"####       DoCrafting.Prefix       #####");
             AdventureBackpacks.Log.Debug($"########################################");
             InventoryPatches.IsDoingCrafting = true;
-
+            CraftingContext.Enter();
         }
+
+        [UsedImplicitly]
+        [HarmonyPriority(100)]
+        static void Finalizer()
+        {
+            CraftingContext.Exit();
+        }
+
         static void Postfix(InventoryGui __instance)
         {
             AdventureBackpacks.Log.Debug($"########################################");
@@ -451,41 +462,92 @@ internal static class InventoryGuiPatches
         }
     }
 
+    // The requirement list counts the equipped backpack too (CraftingContext) and shows "available/required"
+    // unless another mod already formatted the amount.
     [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.SetupRequirement))]
     static class InventoryGuiSetupRequirementPatch
     {
-        // Anchored on the real call to Inventory.CountItems(string,int,bool) instead of raw opcode
-        // index arithmetic, so a shifted method body fails loudly rather than silently no-opping.
-        // The adjustment is inserted directly after the call and works on the stack value, so it does not
-        // depend on how the result is stored.
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        [HarmonyPriority(900)]
+        static void Prefix(Player player)
         {
-            var countItemsMethod = AccessTools.DeclaredMethod(typeof(Inventory), nameof(Inventory.CountItems), new[] { typeof(string), typeof(int), typeof(bool) });
-            var adjustMethod = AccessTools.DeclaredMethod(typeof(PlayerPatches), nameof(PlayerPatches.AdjustCountIfEquipped), new[] { typeof(int), typeof(Player), typeof(Piece.Requirement) });
-
-            var code = instructions.ToList();
-
-            var patched = false;
-            for (var i = 0; i < code.Count; i++)
-            {
-                if (!code[i].Calls(countItemsMethod))
-                    continue;
-
-                // SetupRequirement(Transform, Piece.Requirement req, Player player, ...): [int itemCount] is on the stack.
-                code.InsertRange(i + 1, new[]
-                {
-                    new CodeInstruction(OpCodes.Ldarg_2),                        // Player player
-                    new CodeInstruction(OpCodes.Ldarg_1),                        // Piece.Requirement req
-                    new CodeInstruction(OpCodes.Call, adjustMethod)              // -> adjusted int
-                });
-                i += 3;
-                patched = true;
-            }
-
-            if (!patched)
-                AdventureBackpacks.Log.LogError("InventoryGui.SetupRequirement transpiler: anchor Inventory.CountItems(string,int,bool) not found. Crafting requirements will not account for an equipped backpack.");
-
-            return code;
+            if (player != null && player == Player.m_localPlayer)
+                CraftingContext.Enter();
         }
+
+        [HarmonyPriority(Priority.Last)]
+        static void Postfix(Transform elementRoot, Piece.Requirement req, Player player, bool __result)
+        {
+            if (!__result || elementRoot == null || req?.m_resItem?.m_itemData?.m_shared == null || player == null || player != Player.m_localPlayer)
+                return;
+
+            if (CraftFromBackpack.DisplayTotalIngredientCount is { Value: false } || !CraftingContext.CanCraftFromBackpack)
+                return;
+
+            var text = elementRoot.Find("res_amount")?.GetComponent<TMP_Text>();
+            if (text == null || string.IsNullOrEmpty(text.text))
+                return;
+
+            var current = text.text.Trim();
+            if (CraftFromBackpack.IngredientRegex?.IsMatch(current) == true || !int.TryParse(current, out var required))
+                return;
+
+            var available = player.GetInventory().CountItems(req.m_resItem.m_itemData.m_shared.m_name);
+            text.text = $"{available}/{required}";
+
+            // Vanilla blinks red/white while short; settle on white once the backpack covers it.
+            if (text.color != Color.white && available >= required)
+                text.color = Color.white;
+        }
+
+        [HarmonyPriority(100)]
+        static void Finalizer(Player player)
+        {
+            if (player != null && player == Player.m_localPlayer)
+                CraftingContext.Exit();
+        }
+    }
+
+    [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.UpdateRecipeList))]
+    static class InventoryGuiUpdateRecipeListPatch
+    {
+        [HarmonyPriority(900)]
+        static void Prefix() => CraftingContext.Enter();
+
+        [HarmonyPriority(100)]
+        static void Finalizer() => CraftingContext.Exit();
+    }
+
+    [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.UpdateRecipe))]
+    static class InventoryGuiUpdateRecipePatch
+    {
+        [HarmonyPriority(900)]
+        static void Prefix(Player player)
+        {
+            if (player != null && player == Player.m_localPlayer)
+                CraftingContext.Enter();
+        }
+
+        [HarmonyPriority(100)]
+        static void Finalizer(Player player)
+        {
+            if (player != null && player == Player.m_localPlayer)
+                CraftingContext.Exit();
+        }
+    }
+
+    [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.OnCraftPressed))]
+    static class InventoryGuiOnCraftPressedPatch
+    {
+        [HarmonyPriority(900)]
+        static void Prefix() => CraftingContext.Enter();
+
+        [HarmonyPriority(100)]
+        static void Finalizer() => CraftingContext.Exit();
+    }
+
+    [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.Hide))]
+    static class InventoryGuiHidePatch
+    {
+        static void Postfix() => CraftingContext.Reset();
     }
 }

@@ -84,13 +84,14 @@ internal class ExternalBackpack : BackpackItem
         RegisterStatusEffectInfo();
         RegisterWeightMultiplier(_backpackDefinition.WeightMultiplier);
         RegisterCarryBonus(_backpackDefinition.CarryBonus);
-        RegisterSpeedMod(_backpackDefinition.SpeedMod);
+        RegisterArmorPerLevel(_backpackDefinition.ArmorPerLevel > 0 ? _backpackDefinition.ArmorPerLevel : 1);
+        RegisterSpeedMod(_backpackDefinition.SpeedMod, _backpackDefinition.ScaleSpeedModByQuality);
         RegisterShaderSwap();
     }
 
     internal override void UpdateStatusEffects(int quality, SE_Stats statusEffect, List<HitData.DamageModPair> modifierList, ItemDrop.ItemData itemData)
     {
-        itemData.m_shared.m_movementModifier = SpeedMod.Value / quality;
+        itemData.m_shared.m_movementModifier = GetSpeedModifier(quality);
 
         if (_setEffectsBase != null)
         {

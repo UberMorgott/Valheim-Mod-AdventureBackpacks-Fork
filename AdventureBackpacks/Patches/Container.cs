@@ -13,13 +13,32 @@ public static class ContainerPatches
     [HarmonyPatch(typeof(Container), nameof(Container.TakeAll))]
     static class ContainerTakeAllPatch
     {
-        static void Prefix(Container __instance)
+        static void Prefix()
         {
-            AdventureBackpacks.BypassMoveProtection = true;
+            AdventureBackpacks.PushBypassMoveProtection();
         }
-        static void Postfix(Container __instance)
+
+        static void Finalizer()
         {
-            AdventureBackpacks.BypassMoveProtection = false;
+            AdventureBackpacks.PopBypassMoveProtection();
+        }
+    }
+
+    // A tombstone or a networked chest moves the items only when the owner answers (Container.cs RPC_TakeAllResponse),
+    // after TakeAll returned.
+    [HarmonyPatch(typeof(Container), "RPC_TakeAllResponse")]
+    static class ContainerRpcTakeAllResponsePatch
+    {
+        static void Prefix(bool granted)
+        {
+            if (granted)
+                AdventureBackpacks.PushBypassMoveProtection();
+        }
+
+        static void Finalizer(bool granted)
+        {
+            if (granted)
+                AdventureBackpacks.PopBypassMoveProtection();
         }
     }
 

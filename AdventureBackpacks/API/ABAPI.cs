@@ -252,4 +252,155 @@ return null;
         BackpackFactory.RegisterExternalBackpack(definition);
 #endif
     }
+
+    /// <summary>
+    /// Whether the backpack panel is currently shown. Same as <see cref="IsBackpackPanelOpen"/>.
+    /// </summary>
+    /// <returns>true or false</returns>
+    public static bool IsBackpackOpen()
+    {
+        return IsBackpackPanelOpen();
+    }
+
+    /// <summary>
+    /// Retrieves the Inventory of the equipped backpack on the specified player.
+    /// </summary>
+    /// <param name="player">Player, usually Player.m_localPlayer</param>
+    /// <returns>Inventory object, or null if no backpack equipped</returns>
+    public static Inventory GetEquippedBackpackInventory(Player player)
+    {
+#if ! API
+        return player == null ? null : player.GetEquippedBackpack()?.GetInventory();
+#else
+        return null;
+#endif
+    }
+
+    /// <summary>
+    /// Tries to retrieve the Inventory of the equipped backpack on the specified player.
+    /// </summary>
+    /// <param name="player">Player, usually Player.m_localPlayer</param>
+    /// <param name="inventory">Out parameter for the backpack inventory</param>
+    /// <returns>true if backpack equipped and inventory exists, otherwise false</returns>
+    public static bool TryGetEquippedBackpackInventory(Player player, out Inventory inventory)
+    {
+        inventory = GetEquippedBackpackInventory(player);
+        return inventory != null;
+    }
+
+    /// <summary>
+    /// Retrieves the Inventory of a backpack from an ItemDrop.ItemData object.
+    /// </summary>
+    /// <param name="itemData">ItemDrop.ItemData object</param>
+    /// <returns>Inventory object, or null if not a backpack or uninitialized</returns>
+    public static Inventory GetBackpackInventory(ItemDrop.ItemData itemData)
+    {
+        return itemData == null ? null : GetBackpack(itemData)?.Inventory;
+    }
+
+    /// <summary>
+    /// Tries to retrieve the Inventory of a backpack from an ItemDrop.ItemData object.
+    /// </summary>
+    /// <param name="itemData">ItemDrop.ItemData object</param>
+    /// <param name="inventory">Out parameter for the backpack inventory</param>
+    /// <returns>true if item is a backpack and inventory exists, otherwise false</returns>
+    public static bool TryGetBackpackInventory(ItemDrop.ItemData itemData, out Inventory inventory)
+    {
+        inventory = GetBackpackInventory(itemData);
+        return inventory != null;
+    }
+
+    /// <summary>
+    /// Retrieves all distinct backpack inventories of the player: the equipped one and those carried in the inventory.
+    /// </summary>
+    /// <param name="player">The player to inspect, usually Player.m_localPlayer.</param>
+    /// <returns>A list of unique backpack Inventory instances.</returns>
+    public static List<Inventory> GetAllBackpackInventories(Player player)
+    {
+        var inventories = new List<Inventory>();
+        if (player == null)
+            return inventories;
+
+        var seen = new HashSet<Inventory>();
+        var equipped = GetEquippedBackpackInventory(player);
+        if (equipped != null && seen.Add(equipped))
+            inventories.Add(equipped);
+
+        var playerInventory = player.GetInventory();
+        if (playerInventory == null)
+            return inventories;
+
+        foreach (var item in playerInventory.GetAllItems())
+        {
+            if (TryGetBackpackInventory(item, out var inventory) && seen.Add(inventory))
+                inventories.Add(inventory);
+        }
+
+        return inventories;
+    }
+
+    /// <summary>
+    /// Whether crafting and building may use the materials in the equipped backpack (local setting).
+    /// </summary>
+    /// <returns>true or false</returns>
+    public static bool IsCraftFromBackpackEnabled()
+    {
+#if ! API
+        return CraftFromBackpack.EnableCraftFromBackpack?.Value ?? false;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// Whether a requirement check or payment of the local player is running, during which Inventory.CountItems,
+    /// HaveItem and RemoveItem(name, ...) of the player's inventory include the equipped backpack.
+    /// </summary>
+    /// <returns>true or false</returns>
+    public static bool IsCraftingContextActive()
+    {
+#if ! API
+        return CraftingContext.IsActive;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// Switches crafting from the backpack off until <see cref="UnsuppressNativeCrafting"/> is called with the same
+    /// identifier, for a mod that pays recipe costs itself.
+    /// </summary>
+    /// <param name="modIdentifier">Your mod's GUID.</param>
+    public static void SuppressNativeCrafting(string modIdentifier)
+    {
+#if ! API
+        CraftingContext.Suppress(modIdentifier);
+#endif
+    }
+
+    /// <summary>
+    /// Ends a <see cref="SuppressNativeCrafting"/> of the same identifier.
+    /// </summary>
+    /// <param name="modIdentifier">Your mod's GUID.</param>
+    public static void UnsuppressNativeCrafting(string modIdentifier)
+    {
+#if ! API
+        CraftingContext.Unsuppress(modIdentifier);
+#endif
+    }
+
+    /// <summary>
+    /// Whether a picked up item would go into the equipped backpack (auto store or inventory overflow).
+    /// </summary>
+    /// <param name="player">Player, usually Player.m_localPlayer</param>
+    /// <param name="item">ItemDrop.ItemData candidate for pickup</param>
+    /// <returns>true or false</returns>
+    public static bool WouldStorePickup(Player player, ItemDrop.ItemData item)
+    {
+#if ! API
+        return StoreToBackpack.ShouldStoreToBackpack(player, item, out _);
+#else
+        return false;
+#endif
+    }
 }

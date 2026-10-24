@@ -71,6 +71,7 @@ internal sealed class BackpackRecipe
     private readonly ItemDrop _itemDrop;
     private readonly List<Cost> _craftCosts = new();
     private readonly List<Cost> _upgradeCosts = new();
+    private readonly List<Cost> _upgraderCosts = new();
     private readonly List<DropTarget> _drops = new();
     private readonly List<(CharacterDrop Owner, CharacterDrop.Drop Drop)> _addedDrops = new();
 
@@ -133,6 +134,12 @@ internal sealed class BackpackRecipe
     public void AddUpgradeCost(string item, int amount)
     {
         _upgradeCosts.Add(new Cost { Item = item, Amount = amount });
+    }
+
+    // Idol paid at an upgrader station (CraftingStation.m_upgrader), not per level.
+    public void AddUpgraderCost(string item, int amount)
+    {
+        _upgraderCosts.Add(new Cost { Item = item, Amount = amount });
     }
 
     public void AddDrop(string creature, float chance, int min = 1, int? max = null)
@@ -292,7 +299,7 @@ internal sealed class BackpackRecipe
 
         var craft = _craftCostsConfig != null ? ParseCosts(_craftCostsConfig.Value) : _craftCosts;
         var upgrade = _upgradeCostsConfig != null ? ParseCosts(_upgradeCostsConfig.Value) : _upgradeCosts;
-        _recipe.m_resources = BuildRequirements(objectDB, craft, upgrade);
+        _recipe.m_resources = BuildRequirements(objectDB, craft, upgrade, _upgraderCosts);
     }
 
     private static CraftingStation FindStation(CraftingTable table, string customTable)
@@ -322,8 +329,9 @@ internal sealed class BackpackRecipe
     }
 
     // Craft costs are paid once (m_amount); upgrade costs per level (m_amountPerLevel, Piece.cs:102-110).
-    // An item listed in both gets one requirement carrying both amounts.
-    private static Piece.Requirement[] BuildRequirements(ObjectDB objectDB, List<Cost> craft, List<Cost> upgrade)
+    // An item listed in both gets one requirement carrying both amounts. Upgrader idols are separate
+    // requirements that vanilla asks for only at an upgrader station.
+    private static Piece.Requirement[] BuildRequirements(ObjectDB objectDB, List<Cost> craft, List<Cost> upgrade, List<Cost> upgrader)
     {
         var result = new List<Piece.Requirement>();
         var byItem = new Dictionary<string, Piece.Requirement>();
@@ -361,6 +369,16 @@ internal sealed class BackpackRecipe
                 result.Add(requirement);
             }
             requirement.m_amountPerLevel = cost.Amount;
+        }
+
+        foreach (var cost in upgrader)
+        {
+            // Missing on game versions without upgrader idols: skipped quietly.
+            var itemDrop = objectDB.GetItemPrefab(cost.Item)?.GetComponent<ItemDrop>();
+            if (itemDrop == null)
+                continue;
+
+            result.Add(new Piece.Requirement { m_resItem = itemDrop, m_amount = cost.Amount, m_amountPerLevel = 0, m_recover = false, m_upgraderResource = true });
         }
 
         return result.ToArray();
