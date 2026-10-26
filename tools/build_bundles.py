@@ -18,6 +18,8 @@ from UnityPy.helpers.ResourceReader import get_resource_data
 
 CAP = 256   # largest texture side kept from the fork's classic textures
 STAR = 128  # shared particle texture (512 px BC7 in every bundle)
+OLD_ID = "$vapok_mod_item_"
+NEW_ID = "$adventurebackpacks_item_"
 MODERN = ["meadows", "black_forest", "swamp", "mountains", "plains", "mistlands", "ashlands", "deepnorth"]
 CLASSIC = ["meadows", "black_forest", "swamp", "mountains", "plains", "mistlands"]
 
@@ -55,10 +57,33 @@ def fork_textures(path):
     return result
 
 
+def rename_item(obj):
+    # The upstream prefabs carry Vapok's ids ($vapok_mod_item_*); the fork's code (BackpackFactory item names,
+    # Backpacks.BackpackTypes) and translations use $adventurebackpacks_item_* since 1.9.14.4.
+    try:
+        tree = obj.read_typetree()
+    except Exception:
+        return
+    item = tree.get("m_itemData")
+    if not item:
+        return
+    shared = item["m_shared"]
+    renamed = False
+    for key in ("m_name", "m_description"):
+        if shared[key].startswith(OLD_ID):
+            shared[key] = NEW_ID + shared[key][len(OLD_ID):]
+            renamed = True
+    if renamed:
+        obj.save_typetree(tree)
+
+
 def process(env, fork):
     # Each object is read once and saved at most once: ObjectReader.read() re-parses the original bytes,
     # so a second read would undo an earlier save. Streamed data (.resS) is inlined and the .resS dropped.
     for obj in env.objects:
+        if obj.type.name == "MonoBehaviour":
+            rename_item(obj)
+            continue
         if obj.type.name == "Mesh":
             tree = obj.read_typetree()
             stream = tree.get("m_StreamData")

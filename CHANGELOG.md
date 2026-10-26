@@ -1,3 +1,10 @@
+## 1.10.1.0 - Morgott's fork: backpacks work again
+
+* 1.10.0.0 rebuilt the backpack bundles from upstream 2.4.6, whose prefabs still carried Vapok's ids
+  (`$vapok_mod_item_*`). The fork's code and translations use `$adventurebackpacks_item_*`, so no worn backpack was
+  recognised (no backpack panel, `ABAPI.IsBackpackEquipped` false, no carry bonus) and the names showed as
+  `[vapok_mod_item_backpack_meadows]`. `tools/build_bundles.py` now renames the ids and every bundle was rebuilt.
+
 ## 1.10.0.0 - Morgott's fork: Ashlands and Deep North backpacks, new models, crafting from the backpack
 
 Ported from Vapok's Adventure Backpacks 2.4.6 (telemetry, container tabs and HD texture packs left out).
