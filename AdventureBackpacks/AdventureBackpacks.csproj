@@ -1,21 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
+        <!-- LangVersion, determinism, PathMap, embedded PDB, SourceLink off, ValheimDir/ManagedDir/BepInExDir/PluginsDir
+             and the game's BepInEx + 0Harmony + Jotunn references come from build\Valheim.Build.props. -->
+        <ValheimPlugin>true</ValheimPlugin>
+        <ValheimUseJotunn>true</ValheimUseJotunn>
+        <ValheimUsePublicizer>true</ValheimUsePublicizer>
         <Configurations>Debug;Release;API</Configurations>
         <RootNamespace>AdventureBackpacks</RootNamespace>
         <AssemblyName>AdventureBackpacks</AssemblyName>
-        <LangVersion>latest</LangVersion>
         <!-- Items are listed explicitly: the API configuration compiles a subset. -->
         <EnableDefaultItems>false</EnableDefaultItems>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <!-- Jotunn resolves VALHEIM_INSTALL (Steam registry, or an untracked Environment.props / env var)
-             and publicizes the game assemblies it references from there before each build. -->
-        <ExecutePrebuild>true</ExecutePrebuild>
-        <!-- SDK 8's in-box SourceLink embeds the git commit SHA in the PDB, which the deterministic
-             content id folds into the MVID/PE timestamp: every commit changed the DLL bytes. -->
-        <EnableSourceLink>false</EnableSourceLink>
-        <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -28,8 +25,6 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <!-- Embedded portable PDB: the plugin DLL is the whole deployable and stays byte-reproducible. -->
-        <DebugType>embedded</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
@@ -51,11 +46,12 @@
         <VsxmdAutoDeleteXml>True</VsxmdAutoDeleteXml>
     </PropertyGroup>
     <ItemGroup>
-        <!-- JotunnLib 2.30.0 references UnityEngine.ProfilerModule, which Valheim 1.0.12 no longer ships. -->
-        <Reference Remove="UnityEngine.ProfilerModule" />
-        <Reference Include="BepInEx.Harmony">
-            <HintPath>$(BEPINEX_PATH)\core\BepInEx.Harmony.dll</HintPath>
-        </Reference>
+        <!-- Game assemblies (were injected by the JotunnLib NuGet package as Jotunn-publicized copies). -->
+        <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ManagedDir)\assembly_valheim.dll" Private="false" />
+        <Reference Include="assembly_utils" Publicize="true" HintPath="$(ManagedDir)\assembly_utils.dll" Private="false" />
+        <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ManagedDir)\assembly_guiutils.dll" Private="false" />
+        <Reference Include="Unity.TextMeshPro" HintPath="$(ManagedDir)\Unity.TextMeshPro.dll" Private="false" />
+        <Reference Include="$(ManagedDir)\UnityEngine*.dll" Private="false" />
     </ItemGroup>
     <ItemGroup Condition=" '$(Configuration)|$(Platform)' != 'API|AnyCPU' ">
         <Compile Include="Assets\Backpacks.cs" />
@@ -148,7 +144,6 @@
         <EmbeddedResource Include="Assets\Bundles\adventurebackpacks" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="JotunnLib" Version="2.30.0" />
         <PackageReference Include="Vsxmd" Version="1.4.6" PrivateAssets="all" />
         <PackageReference Include="YamlDotNet" Version="16.3.0" />
     </ItemGroup>
