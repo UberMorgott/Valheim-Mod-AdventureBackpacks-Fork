@@ -1,3 +1,7 @@
+## 1.10.2.1 - Morgott's fork: toolchain migration
+
+- Built with .NET SDK 10.0.403 / C# 14 against the game's own BepInEx/Harmony references; no behaviour change.
+
 ## 1.10.2.0 - Morgott's fork: backpack panel built at load
 
 - The backpack panel is created while the inventory is closed (behind the spawn's loading screen) instead of in the first inventory open: this mod's share of the first open 26 -> 10 ms (RuneSkin harness rp-open-cold).
