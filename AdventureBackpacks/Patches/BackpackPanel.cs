@@ -29,9 +29,15 @@ internal static class BackpackPanel
     private static RectTransform _rect;
     private static InventoryGrid _grid;
     private static UIGroupHandler _group;
-    // TMP_Text, kept as Component/Traverse: this project does not reference the TextMeshPro assembly.
-    private static Traverse _nameText;
-    private static Traverse _weightText;
+    // TMP_Text "text" setters bound once (this project does not reference the TextMeshPro assembly). Vanilla writes the
+    // container weight every frame (InventoryGui.UpdateContainerWeight, InventoryGui.cs:679-686); the panel writes it
+    // only when the rounded weight changes, so no string is built per frame.
+    private static Action<string> _nameText;
+    private static Action<string> _weightText;
+    private static int _shownWeight = -1;
+    // Root canvas of the panel's parent, resolved once: the panel is never reparented.
+    private static RectTransform _canvasRect;
+    private static readonly int AnimVisible = Animator.StringToHash("visible");
     private static RectTransform _weightBox;
     private static bool _weightMirrored;
     private static Inventory _inventory;
@@ -127,10 +133,14 @@ internal static class BackpackPanel
 
         _closedByUser = false;
         _inventory = inventory;
-        _panel.SetActive(true);
+        // Activation only on a real state change: every SetActive(true) re-enables the whole cloned panel
+        // (OnEnable of each Graphic/TMP_Text, canvas rebuild). Closed it is inactive, see Close.
+        if (!_panel.activeSelf)
+            _panel.SetActive(true);
         JoinGroups(gui);
 
-        _nameText?.SetValue(Localization.instance.Localize(inventory.GetName()));
+        _nameText?.Invoke(Localization.instance.Localize(inventory.GetName()));
+        _shownWeight = -1;
         Refresh(gui, inventory);
         Place(gui);
     }
@@ -144,7 +154,10 @@ internal static class BackpackPanel
         if (_panel == null)
             return;
 
-        _panel.SetActive(false);
+        // The panel is a direct child of Inventory_screen/root, outside the panels vanilla's close clip slides off
+        // (m_player, m_crafting, m_info), so deactivating it is its only way to leave the screen.
+        if (_panel.activeSelf)
+            _panel.SetActive(false);
 
         if (gui != null)
         {
@@ -166,10 +179,17 @@ internal static class BackpackPanel
     private static bool OpensWithInventory =>
         ConfigRegistry.OpenWithInventory.Value && !ConfigRegistry.OpenWithHoverInteract.Value;
 
+    // Per frame while open, like vanilla's container grid (InventoryGui.UpdateContainer, InventoryGui.cs:704): the
+    // grid's UpdateGui also drives hover tooltip, drag tint, durability blink and gamepad selection, so it is not
+    // gated on inventory changes.
     private static void Refresh(InventoryGui gui, Inventory inventory)
     {
         _grid.UpdateInventory(inventory, null, gui.m_dragItem);
-        _weightText?.SetValue(Mathf.CeilToInt(inventory.GetTotalWeight()).ToString());
+        var weight = Mathf.CeilToInt(inventory.GetTotalWeight());
+        if (weight == _shownWeight || _weightText == null)
+            return;
+        _shownWeight = weight;
+        _weightText(weight.ToString());
     }
 
     /// <summary>
@@ -351,11 +371,14 @@ internal static class BackpackPanel
         if (parent == null)
             return;
 
-        var canvas = _rect.GetComponentInParent<Canvas>();
-        var canvasRect = canvas != null ? canvas.rootCanvas.transform as RectTransform : null;
-        if (canvasRect == null)
-            return;
-        var bounds = LocalRect(parent, canvasRect);
+        if (_canvasRect == null)
+        {
+            var canvas = _rect.GetComponentInParent<Canvas>();
+            _canvasRect = canvas != null ? canvas.rootCanvas.transform as RectTransform : null;
+            if (_canvasRect == null)
+                return;
+        }
+        var bounds = LocalRect(parent, _canvasRect);
 
         // Panel and weight box (in its vanilla orientation, right of the panel) relative to the panel's pivot.
         var pivot = (Vector2)_rect.localPosition;
@@ -570,12 +593,15 @@ internal static class BackpackPanel
     }
 
     /// <summary>
-    /// Returns a Traverse on the twin's "text" property, or null when it cannot be matched.
+    /// Returns the twin's "text" setter bound to the twin, or null when it cannot be matched.
     /// </summary>
-    private static Traverse TextOfTwin(InventoryGui gui, string fieldName)
+    private static Action<string> TextOfTwin(InventoryGui gui, string fieldName)
     {
         var twin = TwinOf(gui, AccessTools.Field(typeof(InventoryGui), fieldName)?.GetValue(gui) as Component);
-        return twin == null ? null : Traverse.Create(twin).Property("text");
+        var setter = twin == null ? null : AccessTools.Property(twin.GetType(), "text")?.GetSetMethod();
+        if (setter == null || setter.IsStatic || setter.GetParameters()[0].ParameterType != typeof(string))
+            return null;
+        return (Action<string>)Delegate.CreateDelegate(typeof(Action<string>), twin, setter);
     }
 
     /// <summary>
@@ -639,7 +665,7 @@ internal static class BackpackPanel
             var player = Player.m_localPlayer;
 
             // Same visibility vanilla gates its container update on (InventoryGui.UpdateContainer, InventoryGui.cs:696).
-            if (player == null || !__instance.m_animator.GetBool("visible"))
+            if (player == null || !__instance.m_animator.GetBool(AnimVisible))
             {
                 _closedByUser = false;
                 if (IsOpen)
@@ -671,7 +697,8 @@ internal static class BackpackPanel
                 if (_inventory != null && __instance.m_dragInventory == _inventory)
                     __instance.SetupDragItem(null, null, 1);
                 _inventory = inventory;
-                _nameText?.SetValue(Localization.instance.Localize(inventory.GetName()));
+                _nameText?.Invoke(Localization.instance.Localize(inventory.GetName()));
+                _shownWeight = -1;
             }
 
             Refresh(__instance, inventory);
