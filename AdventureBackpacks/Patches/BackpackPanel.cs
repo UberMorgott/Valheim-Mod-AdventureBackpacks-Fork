@@ -212,6 +212,25 @@ internal static class BackpackPanel
             gui.SetActiveGroup(active - 1, playSound: false);
     }
 
+    // The InventoryGui a prewarm already tried: Create fails for good on a screen without m_container / its grid.
+    private static InventoryGui _prewarmed;
+
+    /// <summary>
+    /// Builds the panel while the inventory is closed, on the first closed InventoryGui.Update with a local player
+    /// (the spawn's teleport: behind the loading screen, Hud.UpdateBlackScreen), so the first open only shows it.
+    /// Measured cold (RuneSkin harness rp-open-cold, run 20261028-000356): this mod's patches took 26 ms of the first
+    /// open, which ran the lazy Create (Instantiate of the m_container clone, its components, the Created handlers).
+    /// The panel stays inactive until Open; nothing else changes (no inventory bound, no group joined, not placed).
+    /// Once per InventoryGui (a new screen after a logout builds its own).
+    /// </summary>
+    private static void Prewarm(InventoryGui gui)
+    {
+        if (_panel != null || gui == null || _prewarmed == gui)
+            return;
+        _prewarmed = gui;
+        Create(gui);
+    }
+
     private static bool Create(InventoryGui gui)
     {
         if (gui.m_container == null || gui.m_containerGrid == null)
@@ -625,6 +644,8 @@ internal static class BackpackPanel
                 _closedByUser = false;
                 if (IsOpen)
                     Close(__instance);
+                else if (player != null)
+                    Prewarm(__instance);
                 return;
             }
 
