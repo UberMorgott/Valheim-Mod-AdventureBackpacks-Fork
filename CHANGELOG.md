@@ -1,3 +1,7 @@
+## 1.10.2.3 - Morgott's fork: backpack panel per-frame cost
+
+- The open backpack panel no longer builds a weight string or does reflection per frame: TMP text setters bound once, weight written only when it changes, root canvas cached, SetActive only on a real state change.
+
 ## 1.10.2.2 - Morgott's fork: Valheim 1.0.21 rebuild
 
 - Rebuilt against the Valheim 1.0.21 game references; no code change.
