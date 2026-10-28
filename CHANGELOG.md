@@ -1,3 +1,7 @@
+## 1.10.2.2 - Morgott's fork: Valheim 1.0.21 rebuild
+
+- Rebuilt against the Valheim 1.0.21 game references; no code change.
+
 ## 1.10.2.1 - Morgott's fork: toolchain migration
 
 - Built with .NET SDK 10.0.403 / C# 14 against the game's own BepInEx/Harmony references; no behaviour change.
