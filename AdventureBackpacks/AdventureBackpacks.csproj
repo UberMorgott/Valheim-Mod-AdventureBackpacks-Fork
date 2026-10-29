@@ -12,6 +12,7 @@
         <!-- Items are listed explicitly: the API configuration compiles a subset. -->
         <EnableDefaultItems>false</EnableDefaultItems>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Version>1.10.2.3</Version>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -148,4 +149,30 @@
         <!-- YamlDotNet.dll ships as its own pack plugin (BepInEx\plugins\YamlDotNet); never copy it next to ours. -->
     <PackageReference Include="YamlDotNet" Version="16.3.0" ExcludeAssets="runtime" />
     </ItemGroup>
+  <!-- <Version> is the single source of truth; every copy below must match or the build fails. -->
+  <Target Name="CheckVersionSync" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_VsFile1>$(MSBuildProjectDirectory)\..\manifest.json</_VsFile1>
+      <_VsNeedle1>&quot;version_number&quot;: &quot;$(Version)&quot;</_VsNeedle1>
+      <_VsText1>$([System.IO.File]::ReadAllText('$(_VsFile1)'))</_VsText1>
+      <_VsFile2>$(MSBuildProjectDirectory)\AdventureBackpacks.cs</_VsFile2>
+      <_VsNeedle2>_version = &quot;$(Version)&quot;</_VsNeedle2>
+      <_VsText2>$([System.IO.File]::ReadAllText('$(_VsFile2)'))</_VsText2>
+      <_VsFile3>$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs</_VsFile3>
+      <_VsNeedle3>AssemblyVersion(&quot;$(Version)&quot;)</_VsNeedle3>
+      <_VsText3>$([System.IO.File]::ReadAllText('$(_VsFile3)'))</_VsText3>
+      <_VsFile4>$(MSBuildProjectDirectory)\Properties\AssemblyInfo.cs</_VsFile4>
+      <_VsNeedle4>AssemblyFileVersion(&quot;$(Version)&quot;)</_VsNeedle4>
+      <_VsText4>$([System.IO.File]::ReadAllText('$(_VsFile4)'))</_VsText4>
+    </PropertyGroup>
+    <Error Condition="'$(_VsText1.Contains($(_VsNeedle1)))' != 'true'"
+           Text="..\manifest.json does not carry &lt;Version&gt; $(Version) of AdventureBackpacks.csproj (expected: $(_VsNeedle1))." />
+    <Error Condition="'$(_VsText2.Contains($(_VsNeedle2)))' != 'true'"
+           Text="AdventureBackpacks.cs does not carry &lt;Version&gt; $(Version) of AdventureBackpacks.csproj (expected: $(_VsNeedle2))." />
+    <Error Condition="'$(_VsText3.Contains($(_VsNeedle3)))' != 'true'"
+           Text="Properties\AssemblyInfo.cs does not carry &lt;Version&gt; $(Version) of AdventureBackpacks.csproj (expected: $(_VsNeedle3))." />
+    <Error Condition="'$(_VsText4.Contains($(_VsNeedle4)))' != 'true'"
+           Text="Properties\AssemblyInfo.cs does not carry &lt;Version&gt; $(Version) of AdventureBackpacks.csproj (expected: $(_VsNeedle4))." />
+  </Target>
+
 </Project>
