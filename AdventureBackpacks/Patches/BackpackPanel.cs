@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using BepInEx.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace AdventureBackpacks.Patches;
 /// is worn, with or without a chest, so the player inventory, a chest and the backpack are all usable at the same time.
 /// The panel is a clone of InventoryGui.m_container; vanilla's m_container keeps showing only real containers, so the
 /// backpack inventory is never shown in two grids.
-/// Placement: an external layout owner (RuneSkin "panel.dock") positions it; otherwise <see cref="Place"/> puts it in
+/// Placement: an external layout owner (a skin with "panel.dock") positions it; otherwise <see cref="Place"/> puts it in
 /// free space next to the vanilla panels.
 /// </summary>
 internal static class BackpackPanel
@@ -614,46 +616,19 @@ internal static class BackpackPanel
     }
 
     /// <summary>
-    /// Soft check for an external layout owner: RuneSkin.API's Skin.Supports("panel.dock") (RuneSkin.API\Skin.cs:43),
-    /// resolved once by reflection so the mod runs without RuneSkin. While it docks, the panel is never positioned
-    /// here and the crafting panel never hidden.
+    /// External layout owner: the skin's <c>Supports("panel.dock")</c> through Morgott.Core (soft dependency: the typed
+    /// call runs only while Core is loaded). While it docks, the panel is never positioned here and the crafting panel
+    /// never hidden.
     /// </summary>
     private static class ExternalLayout
     {
-        private static bool _resolved;
-        private static Func<string, bool> _supports;
+        private static readonly bool CoreLoaded = Chainloader.PluginInfos.ContainsKey("morgott.valheim.core");
 
-        public static bool Docks
-        {
-            get
-            {
-                Resolve();
-                if (_supports == null)
-                    return false;
-                try
-                {
-                    return _supports("panel.dock");
-                }
-                catch (Exception e)
-                {
-                    AdventureBackpacks.Log.LogError($"RuneSkin.API Skin.Supports failed, backpack panel placed by Adventure Backpacks: {e.Message}");
-                    _supports = null;
-                    return false;
-                }
-            }
-        }
+        public static bool Docks => CoreLoaded && SkinDocks();
 
-        private static void Resolve()
-        {
-            if (_resolved)
-                return;
-            _resolved = true;
-
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "RuneSkin.API");
-            var method = assembly?.GetType("RuneSkin.API.Skin")?.GetMethod("Supports", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string) }, null);
-            if (method != null && method.ReturnType == typeof(bool))
-                _supports = (Func<string, bool>)Delegate.CreateDelegate(typeof(Func<string, bool>), method);
-        }
+        // Separate method: Morgott.Core types are resolved only when it runs.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static bool SkinDocks() => Morgott.Core.Theme.Available?.Supports("panel.dock") == true;
     }
 
     [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.Update))]

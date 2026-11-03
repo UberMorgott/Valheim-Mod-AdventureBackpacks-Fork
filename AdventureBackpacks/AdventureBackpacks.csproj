@@ -5,6 +5,7 @@
              and the game's BepInEx + 0Harmony + Jotunn references come from build\Valheim.Build.props. -->
         <ValheimPlugin>true</ValheimPlugin>
         <ValheimUseJotunn>true</ValheimUseJotunn>
+        <ValheimUseCore>true</ValheimUseCore>
         <ValheimUsePublicizer>true</ValheimUsePublicizer>
         <Configurations>Debug;Release;API</Configurations>
         <RootNamespace>AdventureBackpacks</RootNamespace>

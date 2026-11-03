@@ -23,6 +23,7 @@ namespace AdventureBackpacks
     [BepInIncompatibility("JotunnBackpacks")]
     [BepInDependency(Jotunn.Main.ModGuid)]
     [BepInDependency("com.ValheimModding.YamlDotNetDetector")]
+    [BepInDependency("morgott.valheim.core", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.chebgonaz.ChebsNecromancy", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.maxsch.valheim.contentswithin", BepInDependency.DependencyFlags.SoftDependency)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
