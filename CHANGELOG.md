@@ -1,3 +1,11 @@
+## 1.10.2.5 - Morgott's fork: Morgott.Core 0.5.0
+
+- Built against Morgott.Core 0.5.0 (was 0.3.0); no behaviour change.
+
+## 1.10.2.4 - Morgott's fork: dock check through Morgott.Core
+
+- The external dock check (`Supports("panel.dock")`) goes through `Morgott.Core.Theme` (soft dependency) instead of reflection on the removed `RuneSkin.API`; Morgott.UI docks the panel.
+
 ## 1.10.2.3 - Morgott's fork: backpack panel per-frame cost
 
 - The open backpack panel no longer builds a weight string or does reflection per frame: TMP text setters bound once, weight written only when it changes, root canvas cached, SetActive only on a real state change.
