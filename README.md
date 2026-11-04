@@ -30,7 +30,7 @@ This fork is not published to Thunderstore; `manifest.json` and the runtime plug
 
 ### Backpack panel API (`AdventureBackpacks.API.ABAPI`)
 
-For layout owners (RuneSkin docking) and gameplay modules (e.g. inventory sorting). All members are main-thread only.
+For layout owners (Morgott.UI docking) and gameplay modules (e.g. inventory sorting). All members are main-thread only.
 
 | Member | Meaning |
 | ------ | ------- |
@@ -40,7 +40,7 @@ For layout owners (RuneSkin docking) and gameplay modules (e.g. inventory sortin
 | `bool IsBackpackPanelOpen()` | Whether the panel is shown. |
 | `event Action<RectTransform> BackpackPanelCreated` | Raised once when the panel is created; late subscribers are called at once. |
 
-Docking: when `RuneSkin.API.Skin.Supports("panel.dock")` is true (checked by reflection, RuneSkin is optional),
+Docking: when `Morgott.Core.Theme.Available?.Supports("panel.dock")` is true (Morgott.Core is a soft dependency; Morgott.UI is the skin),
 Adventure Backpacks never positions the panel and never hides the crafting panel; the layout owner registers and
 places it.
 
