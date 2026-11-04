@@ -24,7 +24,7 @@
   -->
 
   <PropertyGroup>
-    <ValheimBuildVersion>5</ValheimBuildVersion>
+    <ValheimBuildVersion>6</ValheimBuildVersion>
   </PropertyGroup>
 
   <!-- ===== common ===== -->
@@ -133,6 +133,9 @@
          Co-development: -p:CoreRef=<local Morgott.Core.dll> compiles against a local Core build instead. -->
     <CoreRef Condition="'$(CoreRef)' == ''">$(MSBuildThisFileDirectory)ref\Morgott.Core.dll</CoreRef>
     <ValheimEpicLootRef>$(MSBuildThisFileDirectory)ref\EpicLoot.dll</ValheimEpicLootRef>
+    <!-- build\ref\*.dll are default None items, and RAR's {CandidateAssemblyFiles} beats {HintPathFromItem}: without
+         this, -p:CoreRef was ignored and the pinned Core always won. -->
+    <AssemblySearchPath_UseCandidateAssemblyFiles>false</AssemblySearchPath_UseCandidateAssemblyFiles>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(ValheimPlugin)' == 'true' And '$(ValheimUseCore)' == 'true'">
