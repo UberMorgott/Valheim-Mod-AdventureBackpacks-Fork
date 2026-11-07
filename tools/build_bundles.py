@@ -20,6 +20,9 @@ CAP = 256   # largest texture side kept from the fork's classic textures
 STAR = 128  # shared particle texture (512 px BC7 in every bundle)
 OLD_ID = "$vapok_mod_item_"
 NEW_ID = "$adventurebackpacks_item_"
+# Material _Color tints. The satchel's bone trim and toggle sample vanilla bonefragments_d (sRGB mean 219,212,201),
+# a loose-pickup texture that reads as flat white on a worn pack; tinted to vanilla wishbone_d (155,127,106), worn bone.
+TINTS = {"M_Satchel_Bone": (0.745, 0.629, 0.555)}
 MODERN = ["meadows", "black_forest", "swamp", "mountains", "plains", "mistlands", "ashlands", "deepnorth"]
 CLASSIC = ["meadows", "black_forest", "swamp", "mountains", "plains", "mistlands"]
 
@@ -77,12 +80,26 @@ def rename_item(obj):
         obj.save_typetree(tree)
 
 
+def tint(obj):
+    tree = obj.read_typetree()
+    rgb = TINTS.get(tree["m_Name"])
+    if rgb is None:
+        return
+    colors = tree["m_SavedProperties"]["m_Colors"]
+    color = next(value for key, value in colors if key == "_Color")
+    color["r"], color["g"], color["b"] = rgb
+    obj.save_typetree(tree)
+
+
 def process(env, fork):
     # Each object is read once and saved at most once: ObjectReader.read() re-parses the original bytes,
     # so a second read would undo an earlier save. Streamed data (.resS) is inlined and the .resS dropped.
     for obj in env.objects:
         if obj.type.name == "MonoBehaviour":
             rename_item(obj)
+            continue
+        if obj.type.name == "Material":
+            tint(obj)
             continue
         if obj.type.name == "Mesh":
             tree = obj.read_typetree()
