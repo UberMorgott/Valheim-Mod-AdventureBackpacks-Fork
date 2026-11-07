@@ -45,7 +45,10 @@ public static class StoreToBackpack
         if (backpackInventory == null || playerInventory == null || !CanInventoryAccept(backpackInventory, item, item.m_stack))
             return false;
 
-        if (EnableStoreToBackpack.Value && backpackInventory.SafeHaveItem(item.m_shared.m_name))
+        // Vanilla merge first (Inventory.AddItem -> FindFreeStackItem, Inventory.cs:120): a pickup that fits the player's
+        // own stacks of the item tops them up instead of starting a stack in the backpack.
+        if (EnableStoreToBackpack.Value && backpackInventory.SafeHaveItem(item.m_shared.m_name) &&
+            playerInventory.SafeFindFreeStackSpace(item.m_shared.m_name, item.m_worldLevel) < item.m_stack)
             return true;
 
         return EnableInventoryOverflowToBackpack.Value && !CanInventoryAccept(playerInventory, item, item.m_stack);
