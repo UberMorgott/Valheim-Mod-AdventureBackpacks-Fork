@@ -1,3 +1,7 @@
+## 1.10.2.6 - Morgott's fork: Meadows satchel bone trim
+
+- The Meadows satchel's bone trim and toggle no longer read as white patches on the worn pack: the bone material (vanilla bone-fragment texture) is tinted to vanilla worn-bone albedo (`tools/build_bundles.py` `TINTS`).
+
 ## 1.10.2.5 - Morgott's fork: Morgott.Core 0.5.0
 
 - Built against Morgott.Core 0.5.0 (was 0.3.0); no behaviour change.
