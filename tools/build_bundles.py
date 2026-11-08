@@ -3,8 +3,14 @@
   python tools/build_bundles.py <upstream_dir> <fork_dir> <out_dir>
 
 upstream_dir: the 2.4.6 bundles (git show v2.4.6:AdventureBackpacks/Assets/Bundles/<name>).
-fork_dir:     this fork's 1.9.x bundles (backpack_*), whose compressed textures replace the classic ones.
+fork_dir:     this fork's 1.9.x bundles (backpack_*) as of commit 2843026 (texel density matched to vanilla), whose
+              compressed textures replace the classic ones. The bundles are Git LFS files, so extract each with
+              git show 2843026:AdventureBackpacks/Assets/Bundles/<name> | git lfs smudge > <fork_dir>/<name>
+              (a plain git show gives the LFS pointer). Any other commit gives other classic textures and other hashes.
 out_dir:      written: backpack_* (modern models) and classic_backpack_* (original models).
+
+The output must match tools/build_bundles.sha256 byte for byte (verified with UnityPy 1.25.0, etcpak 0.9.15,
+texture2ddecoder 1.0.6, pillow 13.0.0).
 
 Needs: pip install UnityPy etcpak texture2ddecoder pillow
 """
@@ -57,6 +63,9 @@ def fork_textures(path):
         if obj.type.name == "Texture2D":
             texture = obj.read()
             result[texture.m_Name] = texture
+    if not result:
+        # An LFS pointer or wrong file loads as an empty bundle; the classic textures would then silently stay upstream's.
+        raise SystemExit(f"{path}: no textures (Git LFS pointer instead of the bundle?)")
     return result
 
 
