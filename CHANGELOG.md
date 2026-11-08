@@ -1,3 +1,7 @@
+## 1.10.2.7 - Morgott's fork: auto store merges into your own stack first
+
+- Picking up an item the equipped backpack also holds tops up your inventory stack of it when that stack has room; the backpack takes it only when the inventory stacks cannot hold the pile (`StoreToBackpack.ShouldStoreToBackpack`). Before, every such pickup went to the backpack.
+
 ## 1.10.2.6 - Morgott's fork: Meadows satchel bone trim
 
 - The Meadows satchel's bone trim and toggle no longer read as white patches on the worn pack: the bone material (vanilla bone-fragment texture) is tinted to vanilla worn-bone albedo (`tools/build_bundles.py` `TINTS`).
