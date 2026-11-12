@@ -13,7 +13,7 @@
         <!-- Items are listed explicitly: the API configuration compiles a subset. -->
         <EnableDefaultItems>false</EnableDefaultItems>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <Version>1.10.2.7</Version>
+        <Version>1.10.2.8</Version>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -91,7 +91,7 @@
         <Compile Include="Features\CraftFromBackpack.cs" />
         <Compile Include="Features\CraftingContext.cs" />
         <Compile Include="Features\EquipmentEffectCache.cs" />
-        <Compile Include="Features\PieceShaderSwap.cs" />
+        <Compile Include="Features\ShaderSwap.cs" />
         <Compile Include="Features\QuickTransfer.cs" />
         <Compile Include="Features\StoreToBackpack.cs" />
         <Compile Include="Patches\ArmorStand.cs" />

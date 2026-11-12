@@ -1,3 +1,7 @@
+## 1.10.2.8 - Morgott's fork: backpacks look and move like vanilla capes
+
+- Every own backpack (modern and classic models) renders with the game's `Custom/Creature` shader and vanilla CapeDeerHide values (`_Cull 0`, `_TwoSidedNormals 1`, `_AddRain 1`, `_Glossiness 0.12`, no metal) instead of the AssetRipper stub `DoubleSided/Standard/Standard DS` (albedo only, back faces culled): normal maps, wetness and both sides of straps and flaps now show (`Features/ShaderSwap.cs`). Textures keep Point filtering like the vanilla capes.
+- Modern models' skin weights fixed in `tools/build_bundles.py`: Jaw/Head weights moved to Neck (the pack no longer follows head turns), left side mirrored from the authored right side and the shoulder pair split by vertex x, so both straps follow their own shoulder (SM_Backpack_01 LeftShoulder 136 -> 1108 verts, RightShoulder 1678 -> 1268).
 ## 1.10.2.7 - Morgott's fork: auto store merges into your own stack first
 
 - Picking up an item the equipped backpack also holds tops up your inventory stack of it when that stack has room; the backpack takes it only when the inventory stacks cannot hold the pile (`StoreToBackpack.ShouldStoreToBackpack`). Before, every such pickup went to the backpack.

@@ -88,12 +88,12 @@ internal abstract class AssetItem : IAssetItem
         return _prefab.GetComponent<ItemDrop>();
     }
 
-    internal void RegisterShaderSwap()
+    internal void RegisterShaderSwap(string shader = ShaderSwap.Piece)
     {
         if (!ConfigRegistry.ReplaceShader.Value)
             return;
 
-        PieceShaderSwap.Register(_prefab);
+        ShaderSwap.Register(_prefab, shader);
     }
 
     internal void SetPersistence()

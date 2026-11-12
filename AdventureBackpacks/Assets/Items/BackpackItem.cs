@@ -5,6 +5,7 @@ using AdventureBackpacks.API;
 using BepInEx.Configuration;
 using UnityEngine;
 using AdventureBackpacks.Configuration;
+using AdventureBackpacks.Features;
 
 namespace AdventureBackpacks.Assets.Items;
 
@@ -84,6 +85,8 @@ internal abstract class BackpackItem : AssetItem, IBackpackItem
         else
             _localizedCategory = Localization.instance.Localize(_configSection);
 
+        // The mod's own packs are worn like vanilla capes and get their shader.
+        RegisterShaderSwap(ShaderSwap.Creature);
         SetupBackpackDef();
     }
 
