@@ -46,7 +46,7 @@ public class ItemDropPatches
         }
     }
 
-    // Backpack tooltip: armor line, the damage modifiers its status effect grants, and on the worn pack the
+    // Backpack tooltip: armor line, contents weight line, the damage modifiers its status effect grants, and on the worn pack the
     // open/quickdrop keys.
     [HarmonyPatch]
     internal static class ItemDataGetTooltipPatch
@@ -71,6 +71,11 @@ public class ItemDropPatches
 
             if (!__result.Contains("$item_armor"))
                 __result = InsertAfterLine(__result, $"\n$item_armor: <color=orange>{item.GetArmor(qualityLevel, worldLevel)}</color>", "$item_quality", "$item_weight");
+
+            // Contents weight change from the synced Weight Multiplier (GetWeight postfix above); hidden at 0%.
+            var contents = UnityEngine.Mathf.RoundToInt((1f - backpack.WeightMultiplier.Value) * 100f);
+            if (contents != 0 && !__result.Contains("$adventurebackpacks_contents_weight"))
+                __result = InsertAfterLine(__result, $"\n$adventurebackpacks_contents_weight: <color=orange>{(contents > 0 ? "−" : "+")}{Math.Abs(contents)}%</color>", "$item_weight");
 
             var damageMods = item.m_shared.m_damageModifiers;
             if ((damageMods == null || damageMods.Count == 0) && item.m_shared.m_equipStatusEffect is SE_Stats { m_mods.Count: > 0 } stats)
