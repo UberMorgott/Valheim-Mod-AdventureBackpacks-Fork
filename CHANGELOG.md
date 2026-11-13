@@ -1,3 +1,7 @@
+## 1.10.2.9 - Morgott's fork: tooltip shows the contents weight change
+
+- Backpack tooltips show the Weight Multiplier as a "Contents weight" row (e.g. −50%), localized via the new key `adventurebackpacks_contents_weight` (English + Russian) (`Patches/ItemDrop.cs`).
+
 ## 1.10.2.8 - Morgott's fork: backpacks look and move like vanilla capes
 
 - Every own backpack (modern and classic models) renders with the game's `Custom/Creature` shader and vanilla CapeDeerHide values (`_Cull 0`, `_TwoSidedNormals 1`, `_AddRain 1`, `_Glossiness 0.12`, no metal) instead of the AssetRipper stub `DoubleSided/Standard/Standard DS` (albedo only, back faces culled): normal maps, wetness and both sides of straps and flaps now show (`Features/ShaderSwap.cs`). Textures keep Point filtering like the vanilla capes.
